@@ -195,6 +195,154 @@ class StorageManager:
         """Check if a conversation exists"""
         file_path = self._get_file_path(conversation_id)
         return file_path.exists()
+    
+    # ===== Party Plan Storage Methods =====
+    
+    def _get_plan_file_path(self, plan_id: str) -> Path:
+        """Get the file path for a party plan"""
+        plans_path = self.base_path.parent / "plans"
+        plans_path.mkdir(parents=True, exist_ok=True)
+        return plans_path / f"plan_{plan_id}.json"
+    
+    def save_plan(self, plan) -> bool:
+        """
+        Save a party plan to disk
+        
+        Args:
+            plan: PartyPlan object
+            
+        Returns:
+            True on success, False on failure
+        """
+        lock = self._get_lock(f"plan_{plan.id}")
+        file_path = self._get_plan_file_path(plan.id)
+        temp_path = file_path.with_suffix('.tmp')
+        
+        try:
+            with lock:
+                # Convert to dict for JSON serialization
+                data = plan.model_dump(mode='json')
+                
+                # Write to temp file first
+                with open(temp_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+                
+                # Rename temp file to actual file (atomic)
+                temp_path.replace(file_path)
+                
+                logger.info(f"Saved plan {plan.id}")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to save plan {plan.id}: {e}")
+            if temp_path.exists():
+                temp_path.unlink()
+            return False
+    
+    def load_plan(self, plan_id: str):
+        """
+        Load a party plan from disk
+        
+        Args:
+            plan_id: ID of the plan
+            
+        Returns:
+            PartyPlan object or None if not found
+        """
+        from models import PartyPlan  # Import here to avoid circular import
+        
+        lock = self._get_lock(f"plan_{plan_id}")
+        file_path = self._get_plan_file_path(plan_id)
+        
+        try:
+            with lock:
+                if not file_path.exists():
+                    logger.warning(f"Plan {plan_id} not found")
+                    return None
+                
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                plan = PartyPlan(**data)
+                logger.info(f"Loaded plan {plan_id}")
+                return plan
+                
+        except Exception as e:
+            logger.error(f"Failed to load plan {plan_id}: {e}")
+            return None
+    
+    def get_plan_by_conversation(self, conversation_id: str):
+        """
+        Get party plan associated with a conversation
+        
+        Args:
+            conversation_id: ID of the conversation
+            
+        Returns:
+            PartyPlan object or None if not found
+        """
+        from models import PartyPlan  # Import here to avoid circular import
+        
+        try:
+            plans_path = self.base_path.parent / "plans"
+            if not plans_path.exists():
+                return None
+            
+            # Find plan file with matching conversation_id
+            for file_path in plans_path.glob("plan_*.json"):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    
+                    if data.get('conversation_id') == conversation_id:
+                        plan = PartyPlan(**data)
+                        logger.info(f"Found plan for conversation {conversation_id}")
+                        return plan
+                        
+                except Exception as e:
+                    logger.error(f"Failed to read plan from {file_path}: {e}")
+                    continue
+            
+            logger.info(f"No plan found for conversation {conversation_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get plan by conversation {conversation_id}: {e}")
+            return None
+    
+    def delete_plan(self, plan_id: str) -> bool:
+        """
+        Delete a party plan from disk
+        
+        Args:
+            plan_id: ID of the plan
+            
+        Returns:
+            True on success, False on failure
+        """
+        lock = self._get_lock(f"plan_{plan_id}")
+        file_path = self._get_plan_file_path(plan_id)
+        
+        try:
+            with lock:
+                if not file_path.exists():
+                    logger.warning(f"Plan {plan_id} not found for deletion")
+                    return False
+                
+                file_path.unlink()
+                logger.info(f"Deleted plan {plan_id}")
+                
+                # Clean up lock
+                with self._global_lock:
+                    lock_key = f"plan_{plan_id}"
+                    if lock_key in self._locks:
+                        del self._locks[lock_key]
+                
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to delete plan {plan_id}: {e}")
+            return False
 
 
 # Global instance

@@ -15,3 +15,5 @@ AGENT: oto poprawiony plan  wyswietl plan  czy chcesz cos dostosowac czy potwier
 USER: potwierdzam
 
 Jak chce to wpleść w system. Zobacz sobie klasę information gatherer tam jest opis jak możemy to zrobić wysokopoziomowo. Chcemy tak naprawdę, żeby ten powyższy scenariusz nam wyszedł bo jest to demo na potrzeby hackathonu. 
+
+Flow jest tam zrobione w jaki sposob odnosze sie do tego teraz potrzebuje zintegrowac to z frontendem zebysmy dali rade zebrac od uzytkownika potrzebne informacje

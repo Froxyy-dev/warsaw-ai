@@ -76,6 +76,12 @@ warsaw-ai/
 - ✅ Nowoczesny interfejs użytkownika (React)
 - ✅ **Chat AI z integracją Gemini** - Multiturn konwersacje z AI agentem
 - ✅ **Persystencja konwersacji** - Lokalne przechowywanie w JSON
+- ✅ **🎉 Party Planner** - Inteligentne planowanie imprez z iteracyjnym refinementem
+  - Automatyczne wykrywanie party requests
+  - Generowanie szczegółowych planów
+  - Modyfikacja planów na podstawie feedbacku
+  - Zbieranie danych kontaktowych
+  - State persistence między sesjami
 
 ### Do implementacji:
 - 🔄 Integracja z Twilio (dla prawdziwych połączeń)

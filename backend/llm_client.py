@@ -6,12 +6,13 @@ import os
 load_dotenv()
 
 class LLMClient:
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash", system_instruction: str = None):
         """
         Initialize the Gemini Client with a chat session.
         
         Args:
-            model: The model to use. Default is gemini-1.5-flash (stable, higher quota).
+            model: The model to use. Default is gemini-2.5-flash.
+            system_instruction: Optional system instruction for the model.
         """
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
@@ -25,10 +26,16 @@ class LLMClient:
             google_search=types.GoogleSearch()
         )
 
-        self.config = types.GenerateContentConfig(
-            tools=[grounding_tool],
-            system_instruction=self.system_instruction
-        )
+        # Create config with or without system instruction
+        if self.system_instruction:
+            self.config = types.GenerateContentConfig(
+                tools=[grounding_tool],
+                system_instruction=self.system_instruction
+            )
+        else:
+            self.config = types.GenerateContentConfig(
+                tools=[grounding_tool]
+            )
 
         
         # Initialize the chat session immediately
@@ -78,7 +85,7 @@ class LLMClient:
         """
         Resets the conversation history by creating a new chat session.
         """
-        self.chat_session = self.client.chats.create(model=self.model)
+        self.chat_session = self.client.chats.create(model=self.model, config=self.config)
 
 if __name__ == "__main__":
     llm_client = LLMClient(model="gemini-2.5-flash")

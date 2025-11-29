@@ -100,3 +100,37 @@ class MessageResponse(BaseModel):
     message: Message
     assistant_message: str
 
+# Party Planner models
+class PlanStateEnum(str, Enum):
+    INITIAL = "initial"
+    PLANNING = "planning"
+    REFINEMENT = "refinement"
+    CONFIRMED = "confirmed"
+    GATHERING = "gathering"
+    EXECUTING = "executing"
+    COMPLETE = "complete"
+
+# Alias for backward compatibility
+PlanState = PlanStateEnum
+
+class PlanItem(BaseModel):
+    id: str
+    type: str  # "reservation", "order", "call", "task"
+    description: str
+    venue: Optional[str] = None
+    contact_needed: bool = True
+    status: str = "pending"  # "pending", "in_progress", "done"
+    required_info: List[str] = []  # ["phone", "name", "date"]
+
+class PartyPlan(BaseModel):
+    id: str
+    conversation_id: str
+    user_request: str
+    current_plan: Optional[str] = None  # Full plan text
+    plan_items: List[PlanItem] = []
+    state: PlanState
+    gathered_info: dict = {}
+    feedback_history: List[str] = []
+    created_at: datetime
+    updated_at: datetime
+

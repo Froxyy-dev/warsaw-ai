@@ -4,12 +4,13 @@ Manages context, processes messages, and generates AI responses.
 """
 import logging
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import uuid
 
 from llm_client import LLMClient
-from models import Message, MessageRole, Conversation
+from models import Message, MessageRole, Conversation, PartyPlan, PlanState
 from storage_manager import storage_manager
+from party_planner import PartyPlanner
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,8 @@ class ChatService:
             max_context_messages: Maximum number of messages to include in context window
         """
         self.max_context_messages = max_context_messages
+        self.party_planner = PartyPlanner()
+        self.active_plans = {}  # conversation_id -> PartyPlan
         self.system_prompt = """Jesteś pomocnym asystentem AI dla systemu umawiania wizyt i połączeń telefonicznych.
 Możesz pomóc użytkownikom w:
 - Umawianiu wizyt
@@ -77,6 +80,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         """
         Process a user message and generate AI response.
         
+        Handles both normal chat and party planning flow.
+        
         Args:
             conversation_id: ID of the conversation
             content: User message content
@@ -100,11 +105,31 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 metadata={}
             )
             
-            # Generate AI response
-            ai_content = await self.generate_ai_response(
-                conversation.messages,
-                content
-            )
+            # Check if there's an active party plan for this conversation
+            plan = storage_manager.get_plan_by_conversation(conversation_id)
+            
+            if plan and plan.state != PlanState.COMPLETE:
+                # Active party plan exists - route to party planner
+                logger.info(f"Routing to party planner (state: {plan.state})")
+                ai_content = await self._process_party_planning(
+                    conversation_id,
+                    content,
+                    plan
+                )
+            elif self.party_planner.is_party_request(content):
+                # New party request detected
+                logger.info("New party request detected, starting party planner")
+                ai_content = await self._start_party_planning(
+                    conversation_id,
+                    content
+                )
+            else:
+                # Normal chat flow
+                logger.info("Normal chat flow")
+                ai_content = await self.generate_ai_response(
+                    conversation.messages,
+                    content
+                )
             
             # Create assistant message
             assistant_message = Message(
@@ -124,6 +149,88 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         except Exception as e:
             logger.error(f"Failed to process message: {e}")
             raise
+    
+    async def _start_party_planning(
+        self,
+        conversation_id: str,
+        user_request: str
+    ) -> str:
+        """
+        Start a new party planning session
+        
+        Args:
+            conversation_id: ID of the conversation
+            user_request: Initial user request
+            
+        Returns:
+            AI response (initial plan)
+        """
+        logger.info(f"Starting party planning for conversation {conversation_id}")
+        
+        # Reset party planner
+        self.party_planner.reset()
+        
+        # Process initial request
+        response = await self.party_planner.process_request(user_request)
+        
+        # Create and save plan
+        plan = PartyPlan(
+            id=str(uuid.uuid4()),
+            conversation_id=conversation_id,
+            user_request=user_request,
+            current_plan=self.party_planner.current_plan,
+            state=self.party_planner.state,
+            gathered_info={},
+            feedback_history=[],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        
+        storage_manager.save_plan(plan)
+        logger.info(f"Created plan {plan.id} for conversation {conversation_id}")
+        
+        return response
+    
+    async def _process_party_planning(
+        self,
+        conversation_id: str,
+        user_input: str,
+        plan: PartyPlan
+    ) -> str:
+        """
+        Continue an existing party planning session
+        
+        Args:
+            conversation_id: ID of the conversation
+            user_input: User's message
+            plan: Existing PartyPlan
+            
+        Returns:
+            AI response
+        """
+        logger.info(f"Continuing party planning for plan {plan.id}, state: {plan.state}")
+        
+        # Restore party planner state
+        self.party_planner.state = plan.state
+        self.party_planner.current_plan = plan.current_plan
+        self.party_planner.user_request = plan.user_request
+        self.party_planner.feedback_history = plan.feedback_history
+        self.party_planner.gathered_info = plan.gathered_info
+        
+        # Process user input
+        response = await self.party_planner.process_request(user_input)
+        
+        # Update plan
+        plan.current_plan = self.party_planner.current_plan
+        plan.state = self.party_planner.state
+        plan.feedback_history = self.party_planner.feedback_history
+        plan.gathered_info = self.party_planner.gathered_info
+        plan.updated_at = datetime.now()
+        
+        storage_manager.save_plan(plan)
+        logger.info(f"Updated plan {plan.id}, new state: {plan.state}")
+        
+        return response
     
     async def generate_ai_response(
         self, 
