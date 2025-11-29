@@ -6,15 +6,12 @@ import os
 load_dotenv()
 
 class LLMClient:
-    def __init__(self, model: str = "gemini-2.0-flash-exp"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """
         Initialize the Gemini Client with a chat session.
         
         Args:
-            model: The model to use. 
-                   (Note: 'gemini-2.5-flash' in your snippet may be a future/private 
-                   version. I've defaulted to '2.0-flash-exp' for public compatibility,
-                   but you can pass 'gemini-2.5-flash' if you have access).
+            model: The model to use. Default is gemini-1.5-flash (stable, higher quota).
         """
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:

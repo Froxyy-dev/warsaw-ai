@@ -52,3 +52,51 @@ class AppointmentResponse(BaseModel):
     appointment: Appointment
     message: str
 
+# Chat models
+class MessageRole(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+
+class Message(BaseModel):
+    id: str
+    conversation_id: str
+    role: MessageRole
+    content: str
+    timestamp: datetime
+    metadata: Optional[dict] = None
+
+class ConversationStatus(str, Enum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+
+class Conversation(BaseModel):
+    id: str
+    title: Optional[str] = None
+    messages: List[Message] = []
+    created_at: datetime
+    updated_at: datetime
+    status: ConversationStatus = ConversationStatus.ACTIVE
+
+class MessageRequest(BaseModel):
+    content: str = Field(..., description="Message content")
+
+class ConversationMetadata(BaseModel):
+    """Lightweight conversation info without full message history"""
+    id: str
+    title: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    status: ConversationStatus
+    message_count: int
+    last_message_preview: Optional[str] = None
+
+class ConversationResponse(BaseModel):
+    success: bool
+    conversation: Conversation
+    message: str
+
+class MessageResponse(BaseModel):
+    success: bool
+    message: Message
+    assistant_message: str
+

@@ -1,0 +1,45 @@
+{
+  "id": "b750132d-983f-46f4-ac42-c12fbff3135c",
+  "title": "siema",
+  "messages": [
+    {
+      "id": "b5b90ce6-66e2-4d3d-a7db-fb8cc8fe272d",
+      "conversation_id": "b750132d-983f-46f4-ac42-c12fbff3135c",
+      "role": "user",
+      "content": "siema",
+      "timestamp": "2025-11-29T16:01:13.363865",
+      "metadata": {}
+    },
+    {
+      "id": "56e4a1e6-c796-4f70-aef9-fdcdc51845ab",
+      "conversation_id": "b750132d-983f-46f4-ac42-c12fbff3135c",
+      "role": "assistant",
+      "content": "Witaj! Jak mogę Ci pomóc dzisiaj?",
+      "timestamp": "2025-11-29T16:01:16.971269",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "87d7e3f6-ceef-4099-85a4-194d1188afd6",
+      "conversation_id": "b750132d-983f-46f4-ac42-c12fbff3135c",
+      "role": "user",
+      "content": "co tam",
+      "timestamp": "2025-11-29T16:03:07.887662",
+      "metadata": {}
+    },
+    {
+      "id": "489ce7f4-88f9-4e9e-8ae9-22cbb5aceff5",
+      "conversation_id": "b750132d-983f-46f4-ac42-c12fbff3135c",
+      "role": "assistant",
+      "content": "U mnie wszystko w porządku, dziękuję! Jestem gotowy do działania i czekam, aby Ci pomóc.\n\nCzy masz jakąś konkretną sprawę, w której mogę Cię wesprzeć? Na przykład:\n\n*   Chcesz umówić wizytę?\n*   Sprawdzić status jakiegoś połączenia?\n*   Masz pytanie dotyczące naszego systemu?",
+      "timestamp": "2025-11-29T16:03:10.998734",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    }
+  ],
+  "created_at": "2025-11-29T16:01:13.343322",
+  "updated_at": "2025-11-29T16:03:11.000954",
+  "status": "active"
+}
