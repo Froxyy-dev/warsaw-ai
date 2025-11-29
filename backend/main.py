@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-import os
-
+from openai import OpenAI, ChatCompletion 
 from routers import calls, appointments
+import dotenv 
+dotenv.load_dotenv()
 
-load_dotenv()
+# client = OpenAI(
+#     api_key="GEMINI_API_KEY",
+#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+# )
 
 app = FastAPI(
     title="AI Call Agent API",
@@ -29,7 +32,7 @@ app.include_router(appointments.router, prefix="/api/appointments", tags=["appoi
 @app.get("/")
 async def root():
     return {
-        "message": "AI Call Agent API", 
+        "message": "RESPONSE",
         "status": "running",
         "docs": "/docs"
     }
