@@ -12,9 +12,8 @@ ELEVEN_API_KEY=sk_your_key_here
 ELEVEN_AGENT_ID=agent_your_id_here
 ELEVEN_AGENT_PHONE_NUMBER=phnum_your_id_here
 
-# OpenAI (opcjonalne - dla analizy LLM)
-OPENAI_API_KEY=sk-your_openai_key
-LLM_PROVIDER=openai
+# Gemini (opcjonalne - dla analizy LLM)
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### 2. Podstawowe Użycie
@@ -166,19 +165,30 @@ System używa OpenAI GPT-4 do analizy transkryptów. LLM:
 ### Używanie LLM Client
 
 ```python
-from llm_client import call_llm
+from llm_client import LLMClient
 
-# Podstawowe wywołanie
-result = call_llm(
-    prompt="Your prompt here",
-    system_message="You are helpful assistant",
-    model="gpt-4o-mini",
-    response_format="json"
-)
+# Inicjalizuj klienta
+llm = LLMClient(model="gemini-2.5-flash")
 
-# Wynik zawiera:
-# - Odpowiedź od LLM
-# - _meta z informacjami (model, tokens, provider)
+# Pojedyncza wiadomość - zwraca pełną odpowiedź
+response = llm.send("Analyze this conversation...")
+print(response)
+
+# Streaming - zwraca chunki na bieżąco
+for chunk in llm.send_message("Tell me a story..."):
+    print(chunk, end='', flush=True)
+
+# Historia konwersacji
+history = llm.get_history()
+
+# Wyczyść historię
+llm.clear_chat()
+```
+
+### Wymagane zmienne środowiskowe:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ### Voice Agent automatycznie używa LLM

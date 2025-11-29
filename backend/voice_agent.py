@@ -9,7 +9,7 @@ from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 
 from task import Task, Place
-from llm_client import call_llm
+from llm_client import LLMClient
 
 load_dotenv()
 
@@ -253,20 +253,16 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
     prompt = create_analysis_prompt(task, place, transcript)
     
     # Wywołaj LLM
-    llm_result = call_llm(
-        prompt=prompt,
-        system_message="Jesteś ekspertem od analizy rozmów. Zawsze zwracasz JSON.",
-        model="gpt-4o-mini",
-        response_format="json",
-        temperature=0.1
-    )
-    
-    if llm_result:
-        # LLM zwrócił wynik
+    try:
+        llm_client = LLMClient(model="gemini-2.5-flash")
+        response = llm_client.send(prompt)
+        
+        # Parse JSON response
+        import json
+        llm_result = json.loads(response)
+        
         print(f"✅ Analysis complete!")
-        if '_meta' in llm_result:
-            print(f"   Model: {llm_result['_meta'].get('model')}")
-            print(f"   Tokens: {llm_result['_meta'].get('tokens')}\n")
+        print(f"   Model: gemini-2.5-flash\n")
         
         return {
             "success": llm_result.get("success", False),
@@ -274,9 +270,13 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
             "reason": llm_result.get("reason", "No reason provided"),
             "confidence": llm_result.get("confidence", 0.0),
             "appointment_details": llm_result.get("appointment_details", {}),
-            "llm_meta": llm_result.get("_meta", {})
+            "llm_response": llm_result
         }
-    else:
+    except Exception as e:
+        print(f"⚠️  LLM error: {e}")
+        llm_result = None
+    
+    if not llm_result:
         # Fallback - prosta heurystyka
         print("⚠️  LLM unavailable, using fallback heuristics\n")
         

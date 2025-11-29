@@ -58,6 +58,23 @@ class LLMClient:
                     
         except Exception as e:
             yield f"\n[Error: {str(e)}]"
+    
+    def send(self, message: str) -> str:
+        """
+        Sends a message and returns the complete response as a single string.
+        
+        Args:
+            message: The message/prompt to send
+            
+        Returns:
+            Complete response string
+        """
+        response_chunks = []
+        
+        for chunk in self.send_message(message):
+            response_chunks.append(chunk)
+        
+        return ''.join(response_chunks)
 
     def get_history(self):
         """
