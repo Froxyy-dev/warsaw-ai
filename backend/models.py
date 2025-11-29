@@ -107,6 +107,8 @@ class PlanStateEnum(str, Enum):
     REFINEMENT = "refinement"
     CONFIRMED = "confirmed"
     GATHERING = "gathering"
+    SEARCHING = "searching"  # NEW: Web search for venues
+    TASK_GENERATION = "task_generation"  # NEW: Creating voice agent tasks
     EXECUTING = "executing"
     COMPLETE = "complete"
 
@@ -133,4 +135,27 @@ class PartyPlan(BaseModel):
     feedback_history: List[str] = []
     created_at: datetime
     updated_at: datetime
+
+# Venue Search models
+class Venue(BaseModel):
+    name: str
+    phone: Optional[str] = None
+    website: Optional[str] = None
+    address: Optional[str] = None
+    venue_type: str  # "restaurant", "bakery", "venue"
+
+class VenueSearchResult(BaseModel):
+    venues: List[Venue]
+    location: str
+    query_type: str  # "lokale", "cukiernie"
+    searched_at: datetime
+
+# Task List Storage model
+class TaskListStorage(BaseModel):
+    """Model for storing task list in JSON"""
+    plan_id: str
+    conversation_id: str
+    created_at: datetime
+    tasks: List[dict]  # List of Task objects (serialized)
+    status: str = "pending"  # "pending", "in_progress", "completed"
 

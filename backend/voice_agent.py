@@ -130,6 +130,47 @@ def wait_for_conversation_completion(
     return None
 
 
+def debug_conversation_structure(conversation_data: Dict[str, Any]) -> None:
+    """
+    Debug helper - prints the structure of conversation data from ElevenLabs API
+    
+    Args:
+        conversation_data: Data from ElevenLabs API
+    """
+    import json
+    
+    print("\n" + "=" * 80)
+    print("DEBUG: ELEVENLABS CONVERSATION DATA STRUCTURE")
+    print("=" * 80)
+    
+    if not conversation_data:
+        print("❌ No conversation data!")
+        return
+    
+    print(f"\n📋 Top-level keys: {list(conversation_data.keys())}")
+    
+    for key, value in conversation_data.items():
+        if isinstance(value, dict):
+            print(f"\n📂 {key} (dict): {list(value.keys())}")
+        elif isinstance(value, list):
+            print(f"\n📂 {key} (list): length={len(value)}")
+            if value and len(value) > 0:
+                print(f"   First item type: {type(value[0])}")
+                if isinstance(value[0], dict):
+                    print(f"   First item keys: {list(value[0].keys())}")
+                    if len(value[0]) > 0:
+                        first_key = list(value[0].keys())[0]
+                        print(f"   Sample: {first_key} = {value[0][first_key]}")
+        else:
+            print(f"\n📄 {key}: {value}")
+    
+    print("\n" + "=" * 80)
+    print("Full JSON (first 500 chars):")
+    print("=" * 80)
+    print(json.dumps(conversation_data, indent=2)[:500])
+    print("=" * 80 + "\n")
+
+
 def format_transcript(conversation_data: Dict[str, Any]) -> str:
     """
     Formatuje transkrypt do czytelnej formy.
@@ -143,28 +184,60 @@ def format_transcript(conversation_data: Dict[str, Any]) -> str:
     if not conversation_data:
         return "No conversation data"
     
+    # Try to get transcript from different possible locations
     transcript_items = conversation_data.get('transcript', [])
     
+    # If no transcript, try analysis field (ElevenLabs sometimes puts it here)
+    if not transcript_items and 'analysis' in conversation_data:
+        transcript_items = conversation_data['analysis'].get('transcript', [])
+    
+    # Debug: log the structure if transcript is missing
     if not transcript_items:
-        return "Transcript is empty (call may have failed or was very short)"
+        print(f"⚠️  No transcript found. Available keys: {list(conversation_data.keys())}")
+        if 'analysis' in conversation_data:
+            print(f"   Analysis keys: {list(conversation_data['analysis'].keys())}")
+        return "Transcript is empty (call may have failed or was very short)\nStatus: " + conversation_data.get('status', 'unknown')
     
     lines = []
     lines.append("=" * 60)
     lines.append("TRANSKRYPT ROZMOWY")
     lines.append("=" * 60)
     
-    for item in transcript_items:
-        role = item.get('role', 'unknown')
-        message = item.get('message', '')
-        
-        if role == 'agent':
-            lines.append(f"\n🤖 AGENT: {message}")
-        elif role == 'user':
-            lines.append(f"\n👤 USER: {message}")
-        else:
-            lines.append(f"\n❓ {role.upper()}: {message}")
+    # Handle different transcript formats
+    for idx, item in enumerate(transcript_items):
+        try:
+            # Format 1: {role: "agent", message: "text"}
+            if isinstance(item, dict) and 'role' in item:
+                role = item.get('role', 'unknown')
+                message = item.get('message', item.get('text', item.get('content', '')))
+            # Format 2: {speaker: "agent", text: "text"}
+            elif isinstance(item, dict) and 'speaker' in item:
+                role = item.get('speaker', 'unknown')
+                message = item.get('text', item.get('message', item.get('content', '')))
+            # Format 3: String (fallback)
+            elif isinstance(item, str):
+                role = 'unknown'
+                message = item
+            else:
+                print(f"⚠️  Unknown transcript item format at index {idx}: {item}")
+                continue
+            
+            if role == 'agent':
+                lines.append(f"\n🤖 AGENT: {message}")
+            elif role == 'user':
+                lines.append(f"\n👤 USER: {message}")
+            else:
+                lines.append(f"\n❓ {role.upper()}: {message}")
+                
+        except Exception as e:
+            print(f"⚠️  Error parsing transcript item {idx}: {e}")
+            continue
     
     lines.append("\n" + "=" * 60)
+    
+    # If no lines were added (all parsing failed), return error message
+    if len(lines) <= 4:  # Just headers and footer
+        return "Failed to parse transcript. Raw data logged to console."
     
     return "\n".join(lines)
 

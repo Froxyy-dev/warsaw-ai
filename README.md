@@ -78,8 +78,10 @@ warsaw-ai/
 - ✅ **Persystencja konwersacji** - Lokalne przechowywanie w JSON
 - ✅ **🎉 Party Planner** - Inteligentne planowanie imprez z iteracyjnym refinementem
   - Automatyczne wykrywanie party requests
-  - Generowanie szczegółowych planów
+  - **Action-oriented format** - plany gotowe do wykonania przez voice agent
+  - Grupowanie instrukcji po miejscach (lokal, cukiernia, etc)
   - Modyfikacja planów na podstawie feedbacku
+  - Przenoszenie zadań między grupami (np. tort do cukierni)
   - Zbieranie danych kontaktowych
   - State persistence między sesjami
 

@@ -37,3 +37,7 @@ clean:
 
 install-req:
 	pip install -r backend/requirements.txt
+
+clean-database:
+	rm -rf backend/database/conversations/*
+	rm -rf backend/database/plans/*

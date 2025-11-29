@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-d171ffd4",
+  "conversation_id": "",
+  "created_at": "2025-11-29T17:54:55.664578",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-6b4df21a",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Restauracja Kameralna",
+          "phone": "+48 517 127 167"
+        },
+        {
+          "name": "Restauracja Avangarda",
+          "phone": "+48 660 774 266"
+        },
+        {
+          "name": "Gardens by Fort",
+          "phone": "+48 609 755 247"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-f015e656",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Napis na torcie: \"Wszystkiego najlepszego Ada\"\n- Data odbioru: 2025-12-01\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "DESEO Patisserie & Chocolaterie",
+          "phone": "+48 539 817 647"
+        },
+        {
+          "name": "A. Blikle",
+          "phone": "+48 669 609 706"
+        },
+        {
+          "name": "Lukullus",
+          "phone": "+48 726 262 608"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

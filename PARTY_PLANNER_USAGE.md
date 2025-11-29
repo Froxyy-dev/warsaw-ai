@@ -42,46 +42,52 @@ lub
 
 **System wykryje** że to party request i automatycznie przejdzie w tryb planowania.
 
-### Krok 2: System Generuje Plan
+### Krok 2: System Generuje Plan (Action-Oriented Format)
 
-Otrzymasz szczegółowy plan, np:
+Otrzymasz plan w formacie gotowym do wykonania:
 
 ```
-📋 PLAN IMPREZY
+Oto plan dla Twojej imprezy:
 
-1. 🏢 Rezerwacja sali
-   • Miejsce: Restaurant X
-   • Godzina: 19:00
-   • Liczba osób: 10
+Zadzwonić do lokalu z salami z następującymi instrukcjami:
+- Impreza zaczyna się około godziny 16:00 i potrwa około 5 godzin.
+- Zarezerwuj stolik w restauracji lub małą salę na 10 osób.
+- Poproś o proste dekoracje, takie jak balony i serwetki.
+- Omów menu z restauracją.
+- Poproś o tort urodzinowy.
 
-2. 🎂 Tort urodzinowy
-   • Cukiernia: Słodkie Cuda
-   • Rodzaj: Urodzinowy
-
-3. 🍽️ Catering
-   • Menu: Mix przystawek
-   • Liczba osób: 10
-
-─────────────────────────
-💬 Czy chcesz coś dostosować czy potwierdzasz plan?
+Czy chcesz coś zmienić czy zatwierdzasz?
 ```
+
+**Nowy Format:** Instrukcje są pogrupowane po miejscach do których trzeba zadzwonić - gotowe do wykonania przez asystenta lub voice agent!
 
 ### Krok 3a: Modyfikuj Plan (opcjonalnie)
 
 Możesz wprowadzać zmiany:
+
+**Przykład: Przenieś tort do dedykowanej cukierni**
 ```
-"Dodaj balony do dekoracji"
+"Tort chcę z dedykowanej cukierni, napis 'Wszystkiego najlepszego Ada'"
 ```
 
+System utworzy **nową grupę akcji** dla cukierni:
 ```
-"Zmień cukiernię na dedykowaną"
+Oto zaktualizowany plan:
+
+Zadzwonić do lokalu z salami z następującymi instrukcjami:
+- Impreza zaczyna się około godziny 16:00 i potrwa około 5 godzin.
+- Zarezerwuj stolik w restauracji lub małą salę na 10 osób.
+- Poproś o proste dekoracje, takie jak balony i serwetki.
+- Omów menu z restauracją.
+
+Zadzwonić do cukierni z tortami z następującymi instrukcjami:
+- Poproś o tort urodzinowy.
+- Na torcie powinno być napisane "Wszystkiego najlepszego Ada".
+
+Czy chcesz coś zmienić czy zatwierdzasz?
 ```
 
-```
-"Chcę większy tort"
-```
-
-System zaktualizuje plan i pokaże nową wersję.
+System **automatycznie** przeniesie instrukcje między grupami!
 
 ### Krok 3b: Potwierdź Plan
 
