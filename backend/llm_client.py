@@ -75,6 +75,28 @@ class LLMClient:
         
         return ''.join(response_chunks)
 
+    def transcribe(self, audio_bytes: bytes, mime_type: str) -> str:
+        """
+        Transcribes an audio file using the generative model.
+        
+        Args:
+            audio_bytes: The audio file content in bytes.
+            mime_type: The MIME type of the audio file.
+            
+        Returns:
+            The transcribed text.
+        """
+        try:
+            part = types.Part.from_bytes(data=audio_bytes, mime_type=mime_type)
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=['transcribe this audio', part]
+            )
+            return response.text
+        except Exception as e:
+            print(f"An error occurred during transcription: {e}")
+            return ""
+
     def get_history(self):
         """
         Retrieves the conversation history.

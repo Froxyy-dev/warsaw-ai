@@ -1,13 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './ChatWindow.css';
-import { sendMessage as sendMessageApi, createConversation, getConversations, getConversation } from '../api/chatApi';
+import React, { useState, useEffect, useRef } from "react";
+import "./ChatWindow.css";
+import {
+  sendMessage as sendMessageApi,
+  createConversation,
+  getConversations,
+  getConversation,
+  transcribeAudio,
+} from "../api/chatApi";
 
 function ChatWindow() {
   const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [conversationId, setConversationId] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const timerIntervalRef = useRef(null);
   const [isSearching, setIsSearching] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -29,7 +40,7 @@ function ChatWindow() {
           setMessages(conv.messages || []);
         }
       } catch (err) {
-        console.error('Failed to load conversation:', err);
+        console.error("Failed to load conversation:", err);
       }
     };
 
@@ -44,31 +55,32 @@ function ChatWindow() {
   // Auto-refresh conversation when searching
   useEffect(() => {
     if (isSearching && conversationId) {
-      console.log('🔄 Starting auto-refresh (searching venues/bakeries)...');
-      
+      console.log("🔄 Starting auto-refresh (searching venues/bakeries)...");
+
       autoRefreshInterval.current = setInterval(async () => {
         try {
-          console.log('🔄 Auto-refreshing conversation...');
+          console.log("🔄 Auto-refreshing conversation...");
           const conv = await getConversation(conversationId);
           setMessages(conv.messages);
-          
+
           // Check if we're still searching by looking at last message
           const lastMsg = conv.messages[conv.messages.length - 1];
-          if (lastMsg && (
-              lastMsg.content.includes('🎉 Wszystko gotowe') ||
-              lastMsg.content.includes('🎉 Zakończono wszystkie zadania')
-          )) {
-            console.log('✅ Process complete, stopping auto-refresh');
+          if (
+            lastMsg &&
+            (lastMsg.content.includes("🎉 Wszystko gotowe") ||
+              lastMsg.content.includes("🎉 Zakończono wszystkie zadania"))
+          ) {
+            console.log("✅ Process complete, stopping auto-refresh");
             setIsSearching(false);
           }
         } catch (err) {
-          console.error('Auto-refresh failed:', err);
+          console.error("Auto-refresh failed:", err);
         }
       }, 2000); // Refresh every 2 seconds
 
       return () => {
         if (autoRefreshInterval.current) {
-          console.log('⏹️ Stopping auto-refresh');
+          console.log("⏹️ Stopping auto-refresh");
           clearInterval(autoRefreshInterval.current);
         }
       };
@@ -83,12 +95,12 @@ function ChatWindow() {
   }, []);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const ensureConversation = async () => {
     if (conversationId) return conversationId;
-    
+
     // Create new conversation
     const response = await createConversation();
     const newId = response.conversation.id;
@@ -96,79 +108,136 @@ function ChatWindow() {
     return newId;
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    
-    if (!inputValue.trim() || isLoading) {
+  const handleSendMessage = async (messageContent, isVoiceMessage = false) => {
+    if (!messageContent.trim() || isLoading) {
       return;
     }
 
-    const messageContent = inputValue.trim();
-    setInputValue('');
+    if (!isVoiceMessage) {
+      setInputValue(""); // Clear input only if it's a text message
+    }
     setError(null);
 
     // Optimistic update - add user message immediately
     const userMessage = {
       id: `temp-${Date.now()}`,
-      role: 'user',
+      role: "user",
       content: messageContent,
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
     try {
       // Ensure conversation exists
       const convId = await ensureConversation();
-      console.log('Conversation ID:', convId);
-      
+
       // Send message to backend
-      console.log('Sending message:', messageContent);
       const response = await sendMessageApi(convId, messageContent);
-      console.log('Got response:', response);
 
       // Reload entire conversation from backend
-      console.log('Reloading conversation...');
       const updatedConv = await getConversation(convId);
-      console.log('Updated conversation:', updatedConv);
       setMessages(updatedConv.messages || []);
 
+      // No speech synthesis, so just update messages
       // Check if backend is processing - if so, start auto-refresh
       const lastMessage = updatedConv.messages[updatedConv.messages.length - 1];
-      if (lastMessage && (
-          lastMessage.content.includes('🔍 Zaczynam wyszukiwanie') ||
-          lastMessage.content.includes('📞 Rozpoczynam wykonywanie')
-      )) {
-        console.log('🔍 Detected active processing, enabling auto-refresh');
+      if (
+        lastMessage &&
+        (lastMessage.content.includes("🔍 Zaczynam wyszukiwanie") ||
+          lastMessage.content.includes("📞 Rozpoczynam wykonywanie"))
+      ) {
+        console.log("🔍 Detected active processing, enabling auto-refresh");
         setIsSearching(true);
       }
-
     } catch (err) {
-      console.error('Failed to send message:', err);
-      console.error('Error details:', err.response?.data || err.message);
-      setError(`Błąd: ${err.response?.data?.detail || err.message || 'Nie udało się wysłać wiadomości'}`);
+      console.error("Failed to send message:", err);
+      setError(
+        `Błąd: ${
+          err.response?.data?.detail ||
+          err.message ||
+          "Nie udało się wysłać wiadomości"
+        }`
+      );
       // Remove optimistic user message on error
-      setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
-      // Restore input value
-      setInputValue(messageContent);
+      setMessages((prev) => prev.filter((msg) => msg.id !== userMessage.id));
+      // Restore input value only if it was a text message and it failed
+      if (!isVoiceMessage) {
+        setInputValue(messageContent);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleSendMessage(inputValue, false); // Explicitly mark as text message
+  };
+
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage(e);
+      handleSendMessage(inputValue, false); // Explicitly mark as text message
     }
+  };
+
+  const handleRecord = async () => {
+    if (isRecording) {
+      // Stop recording
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      clearInterval(timerIntervalRef.current);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        mediaRecorderRef.current.ondataavailable = (event) => {
+          audioChunksRef.current.push(event.data);
+        };
+        mediaRecorderRef.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: "audio/webm",
+          });
+          audioChunksRef.current = [];
+          try {
+            const res = await transcribeAudio(audioBlob);
+            handleSendMessage(res.transcription, true); // Mark as voice message
+          } catch (err) {
+            console.error("Failed to transcribe audio:", err);
+            setError("Błąd transkrypcji audio.");
+          }
+        };
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+        setRecordingTime(0); // Reset timer
+        timerIntervalRef.current = setInterval(() => {
+          setRecordingTime((prevTime) => prevTime + 1);
+        }, 1000);
+      } catch (err) {
+        console.error("Failed to start recording:", err);
+        setError("Nie można uzyskać dostępu do mikrofonu.");
+      }
+    }
+  };
+
+  const formatRecordingTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
   };
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('pl-PL', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString("pl-PL", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -183,10 +252,7 @@ function ChatWindow() {
           </div>
         ) : (
           messages.map((message) => (
-            <div 
-              key={message.id} 
-              className={`message ${message.role}`}
-            >
+            <div key={message.id} className={`message ${message.role}`}>
               <div className="message-content">
                 <div className="message-text">{message.content}</div>
                 <div className="message-timestamp">
@@ -196,7 +262,7 @@ function ChatWindow() {
             </div>
           ))
         )}
-        
+
         {isLoading && (
           <div className="message assistant typing">
             <div className="message-content">
@@ -208,36 +274,57 @@ function ChatWindow() {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
-      {error && (
-        <div className="error-banner">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-banner">{error}</div>}
 
-      <form className="message-input-form" onSubmit={handleSendMessage}>
-        <div className="input-container">
-          <textarea
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Napisz wiadomość..."
-            rows="1"
+      <div className="input-area">
+        {error && <div className="error-banner">{error}</div>}{" "}
+        {/* Moved error banner */}
+        {isRecording && (
+          <div className="recording-status">
+            <span>Nagrywanie...</span>
+            <span>{formatRecordingTime(recordingTime)}</span>
+          </div>
+        )}
+        <div className="input-controls">
+          {" "}
+          {/* New container for input and buttons */}
+          <button
+            type="button"
+            onClick={handleRecord}
+            className={`record-button ${isRecording ? "recording" : ""}`}
             disabled={isLoading}
-          />
-          <button 
-            type="submit" 
-            disabled={!inputValue.trim() || isLoading}
-            className="send-button"
+            title={
+              isRecording ? "Zatrzymaj nagrywanie" : "Nagraj wiadomość głosową"
+            }
           >
-            {isLoading ? '⏳' : '📤'}
+            {isRecording ? "⏹️" : "🎙️"}
           </button>
+          <form className="message-input-form" onSubmit={handleFormSubmit}>
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Napisz wiadomość..."
+              rows="1"
+              disabled={isLoading}
+              aria-label="Napisz wiadomość"
+            />
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isLoading}
+              className="send-button"
+              title="Wyślij wiadomość"
+            >
+              {isLoading ? "⏳" : "📤"}
+            </button>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
