@@ -50,15 +50,7 @@ function ChatWindow() {
         try {
           console.log('🔄 Auto-refreshing conversation...');
           const conv = await getConversation(conversationId);
-          console.log('   Fetched conversation with', conv.messages.length, 'messages');
-          console.log('   Current state has', messages.length, 'messages');
-          
-          if (conv.messages.length !== messages.length) {
-            console.log('   ✅ NEW MESSAGES DETECTED! Updating...');
-          }
-          
-          // Force update by creating new array reference
-          setMessages([...conv.messages]);
+          setMessages(conv.messages);
         } catch (err) {
           console.error('Auto-refresh failed:', err);
         }
