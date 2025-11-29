@@ -71,12 +71,14 @@ function ChatWindow() {
     return newId;
   };
 
-  const handleSendMessage = async (messageContent) => {
+  const handleSendMessage = async (messageContent, isVoiceMessage = false) => {
     if (!messageContent.trim() || isLoading) {
       return;
     }
 
-    setInputValue("");
+    if (!isVoiceMessage) {
+      setInputValue(""); // Clear input only if it's a text message
+    }
     setError(null);
 
     // Optimistic update - add user message immediately
@@ -113,8 +115,10 @@ function ChatWindow() {
       );
       // Remove optimistic user message on error
       setMessages((prev) => prev.filter((msg) => msg.id !== userMessage.id));
-      // Restore input value
-      setInputValue(messageContent);
+      // Restore input value only if it was a text message and it failed
+      if (!isVoiceMessage) {
+        setInputValue(messageContent);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -122,13 +126,13 @@ function ChatWindow() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    handleSendMessage(inputValue);
+    handleSendMessage(inputValue, false); // Explicitly mark as text message
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage(inputValue);
+      handleSendMessage(inputValue, false); // Explicitly mark as text message
     }
   };
 
@@ -155,7 +159,7 @@ function ChatWindow() {
           audioChunksRef.current = [];
           try {
             const res = await transcribeAudio(audioBlob);
-            handleSendMessage(res.transcription);
+            handleSendMessage(res.transcription, true); // Mark as voice message
           } catch (err) {
             console.error("Failed to transcribe audio:", err);
             setError("Błąd transkrypcji audio.");
@@ -230,38 +234,49 @@ function ChatWindow() {
       {error && <div className="error-banner">{error}</div>}
 
       <div className="input-area">
+        {error && <div className="error-banner">{error}</div>}{" "}
+        {/* Moved error banner */}
         {isRecording && (
           <div className="recording-status">
             <span>Nagrywanie...</span>
             <span>{formatRecordingTime(recordingTime)}</span>
           </div>
         )}
-        <form className="message-input-form" onSubmit={handleFormSubmit}>
-          <textarea
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Napisz wiadomość..."
-            rows="1"
-            disabled={isLoading}
-          />
+        <div className="input-controls">
+          {" "}
+          {/* New container for input and buttons */}
           <button
             type="button"
             onClick={handleRecord}
             className={`record-button ${isRecording ? "recording" : ""}`}
             disabled={isLoading}
+            title={
+              isRecording ? "Zatrzymaj nagrywanie" : "Nagraj wiadomość głosową"
+            }
           >
             {isRecording ? "⏹️" : "🎙️"}
           </button>
-          <button
-            type="submit"
-            disabled={!inputValue.trim() || isLoading}
-            className="send-button"
-          >
-            {isLoading ? "⏳" : "📤"}
-          </button>
-        </form>
+          <form className="message-input-form" onSubmit={handleFormSubmit}>
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Napisz wiadomość..."
+              rows="1"
+              disabled={isLoading}
+              aria-label="Napisz wiadomość"
+            />
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isLoading}
+              className="send-button"
+              title="Wyślij wiadomość"
+            >
+              {isLoading ? "⏳" : "📤"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

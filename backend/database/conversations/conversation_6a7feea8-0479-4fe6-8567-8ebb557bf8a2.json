@@ -307,9 +307,45 @@
       "metadata": {
         "model": "gemini-2.5-flash"
       }
+    },
+    {
+      "id": "ffd22429-abfa-4451-827d-bc6fa8955e2f",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Test głosu, test głosu.",
+      "timestamp": "2025-11-29T18:06:54.333913",
+      "metadata": {}
+    },
+    {
+      "id": "ada10f60-fe82-47bc-bf0e-a1b98ede5685",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, to był test głosu. Dziękuję.\n\nCzy mogę Ci w czymś pomóc? Na przykład, czy chcesz umówić wizytę, sprawdzić status połączenia, zarządzać kalendarzem, czy masz jakieś pytania dotyczące systemu?",
+      "timestamp": "2025-11-29T18:06:56.474607",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "462d68de-4213-47dd-999a-3ca364f112a0",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Ale dobry buto.\n[Organ/Keyboard sound]",
+      "timestamp": "2025-11-29T18:09:38.916794",
+      "metadata": {}
+    },
+    {
+      "id": "b1f2b114-8829-44fa-82c9-3da34a75f1e6",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. Dziękuję za informację.\n\nJestem tutaj, aby pomóc Ci z:\n*   **Umawianiem wizyt**\n*   **Sprawdzaniem statusu połączeń**\n*   **Zarządzaniem terminarzem**\n*   **Odpowiadaniem na pytania o system**\n\nCzy mogę Ci pomóc w którymś z tych obszarów?",
+      "timestamp": "2025-11-29T18:09:43.377451",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
     }
   ],
   "created_at": "2025-11-29T16:33:55.582913",
-  "updated_at": "2025-11-29T17:58:11.810588",
+  "updated_at": "2025-11-29T18:09:43.380221",
   "status": "active"
 }

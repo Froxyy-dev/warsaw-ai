@@ -147,12 +147,23 @@
 
 /* Message input */
 .input-area {
-  padding: 1rem 20% 2rem;
+  padding: 1rem 20% 2rem; /* Adjust padding for visual balance */
   background: #1a1a1a;
   border-top: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1rem; /* Space between error/recording and input controls */
+}
+
+/* Error banner styling within input-area */
+.input-area .error-banner {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: #2d1515;
+  color: #ff6b6b;
+  text-align: center;
+  font-size: 0.95rem;
+  border: 1px solid #3d2020;
 }
 
 .recording-status {
@@ -165,6 +176,7 @@
   background: #2d1515;
   border-radius: 12px;
   animation: fadeIn 0.3s ease;
+  border: 1px solid #3d2020;
 }
 
 .recording-status span:first-child::before {
@@ -195,45 +207,51 @@
   }
 }
 
-.message-input-form {
+.input-controls {
+  display: flex;
+  gap: 0.75rem; /* Space between record button and message form */
+  align-items: flex-end;
   width: 100%;
 }
 
-.input-container {
+.message-input-form {
+  flex: 1; /* Allows form to take remaining space */
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem; /* Space between textarea and send button */
   align-items: flex-end;
-  max-width: 100%;
+  width: 100%;
 }
 
-.input-container textarea {
+.message-input-form textarea {
   flex: 1;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem; /* Slightly reduced padding */
   border: 2px solid #2a2a2a;
-  border-radius: 16px;
+  border-radius: 20px; /* More rounded corners */
   font-size: 1.05rem;
   font-family: inherit;
   resize: none;
-  min-height: 60px;
+  min-height: 58px; /* Slightly adjusted min-height */
   max-height: 200px;
   transition: all 0.2s;
   background: #252525;
   color: #e0e0e0;
   line-height: 1.6;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); /* Inner shadow for depth */
 }
 
-.input-container textarea::placeholder {
+.message-input-form textarea::placeholder {
   color: #666;
 }
 
-.input-container textarea:focus {
+.message-input-form textarea:focus {
   outline: none;
   border-color: #4a9eff;
-  box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.15);
+  box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.15),
+    inset 0 1px 3px rgba(0, 0, 0, 0.3);
   background: #2a2a2a;
 }
 
-.input-container textarea:disabled {
+.message-input-form textarea:disabled {
   background: #1a1a1a;
   cursor: not-allowed;
   opacity: 0.5;
@@ -242,16 +260,16 @@
 .record-button,
 .send-button {
   padding: 0;
-  width: 60px;
-  height: 60px;
+  width: 58px; /* Adjusted size */
+  height: 58px; /* Adjusted size */
   background: #2563eb;
   color: white;
   border: none;
-  border-radius: 16px;
-  font-size: 1.5rem;
+  border-radius: 50%; /* Make buttons circular */
+  font-size: 1.4rem; /* Slightly adjusted font size */
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Softer shadow */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,42 +277,62 @@
 }
 
 .record-button {
-  background: #333;
+  background: #3a3a3a; /* Darker background for record button */
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
 .record-button.recording {
-  background: #c0392b;
+  background: #e74c3c; /* Redder tone for recording */
   animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(224, 82, 99, 0.7);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(224, 82, 99, 0);
+    box-shadow: 0 0 0 12px rgba(231, 76, 60, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(224, 82, 99, 0);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
   }
 }
 
 .send-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
   background: #1d4ed8;
 }
 
 .send-button:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .send-button:disabled {
-  opacity: 0.4;
+  opacity: 0.3; /* More subtle disabled state */
   cursor: not-allowed;
   transform: none;
+  background: #2563eb; /* Keep original color but lower opacity */
+}
+
+.record-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(58, 58, 58, 0.4);
+  background: #4a4a4a; /* Slightly lighter on hover */
+}
+
+.record-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.record-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  background: #3a3a3a;
 }
 
 /* Error banner */
