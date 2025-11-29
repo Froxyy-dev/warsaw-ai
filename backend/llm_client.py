@@ -1,16 +1,8 @@
-import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-
-# Load environment variables once when the module is imported
-load_dotenv()
-import os
 from typing import Generator, List
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-
+import os
 load_dotenv()
 
 class LLMClient:
