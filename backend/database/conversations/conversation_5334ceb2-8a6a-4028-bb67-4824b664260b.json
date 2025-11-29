@@ -1,0 +1,135 @@
+{
+  "id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+  "title": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj i...",
+  "messages": [
+    {
+      "id": "336afc55-630e-4240-bc4c-e84c9864f006",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "user",
+      "content": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
+      "timestamp": "2025-11-29T20:19:31.105684",
+      "metadata": null
+    },
+    {
+      "id": "35b6dfa8-be17-4c6d-8f6d-589f75255f9b",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "Oto plan dla Twojej imprezy:\n\nZadzwonić do lokalu w Warszawie z następującymi instrukcjami:\n- Rezerwacja: 1 grudnia, godzina 16:00, 5 godzin.\n- Liczba osób: dziesięć.\n- Impreza urodzinowa.\n- Proszę o propozycje menu.\n- Opcje tortu i dekoracji.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-29T21:19:36.530930",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0e780cc7-a6c9-4f17-b2f9-cc44989090ef",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "user",
+      "content": "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska.",
+      "timestamp": "2025-11-29T20:19:38.084637",
+      "metadata": null
+    },
+    {
+      "id": "43e43c32-5196-4620-8e68-514bdc904e1f",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "Oto zaktualizowany plan:\n\nZadzwonić do lokalu w Warszawie:\n- Rezerwacja: 1 grudnia, 16:00, 5h.\n- Liczba osób: dziesięć.\n- Impreza urodzinowa.\n- Menu: tradycyjna kuchnia polska.\n- Propozycje dekoracji.\n\nZadzwonić do cukierni:\n- Zamówić tort urodzinowy.\n- Napis: \"Wszystkiego najlepszego Ada\".\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-29T21:19:46.607941",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "04524389-d39d-4f18-a200-7463850f8142",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "user",
+      "content": "Zatwierdzam kurwa",
+      "timestamp": "2025-11-29T20:19:53.974965",
+      "metadata": null
+    },
+    {
+      "id": "a5bf6a34-8620-41c2-90a3-49ec4c239c54",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "✅ Plan zatwierdzony!\n\n📝 Teraz potrzebuję kilku danych do realizacji...\n\nJak się nazywasz (imię i nazwisko)?\nJaki masz numer telefonu?",
+      "timestamp": "2025-11-29T21:19:55.170047",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "5a4e6eda-e3dd-4ea6-a8a7-7ada52f2b75a",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "user",
+      "content": "Mateusz Winiarek, 886859039",
+      "timestamp": "2025-11-29T20:20:05.001447",
+      "metadata": null
+    },
+    {
+      "id": "82f24211-1e19-4b69-b037-8734853f9c99",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "✅ Świetnie! Mam wszystkie potrzebne dane.\n\n🔍 Zaczynam wyszukiwanie lokali i cukierni...",
+      "timestamp": "2025-11-29T21:20:07.452286",
+      "metadata": {
+        "step": "search_starting"
+      }
+    },
+    {
+      "id": "ced70e3e-d7ad-4779-9d5e-9289b57f7357",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "🏢 Lokale w Warszawa:\n\n1. Moonsfera\n   📞 +48 509 060 050\n   🌐 www.moonsfera.pl\n\n2. Restauracja Kameralna\n   📞 +48 517 127 167\n   🌐 www.kameralnarestauracja.pl\n\n3. Gardens by Fort\n   📞 +48 609 755 247\n   🌐 www.gardensbyfort.pl",
+      "timestamp": "2025-11-29T21:20:23.228084",
+      "metadata": {
+        "step": "venue_search"
+      }
+    },
+    {
+      "id": "8a67b44b-29c2-49ba-ab00-2906934f4089",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "🍰 Cukiernie w Warszawa:\n\n1. Cukiernia Lukullus\n   📞 +48 726 26 26 08\n   🌐 www.cukiernialukullus.pl\n\n2. Cukiernia A. Blikle\n   📞 +48 661 335 210\n   🌐 www.blikle.pl\n\n3. Cukiernia AleTort\n   📞 +48 516 163 163\n   🌐 www.aletort.pl",
+      "timestamp": "2025-11-29T21:20:41.025503",
+      "metadata": {
+        "step": "bakery_search"
+      }
+    },
+    {
+      "id": "3f32ddb0-2836-4344-9960-3278bd681b42",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "✅ Lista zadań gotowa! Przygotowano 2 zadań.\n📋 Szczegóły wyświetlone w konsoli backendu.\n\n📞 Rozpoczynam wykonywanie zadań...",
+      "timestamp": "2025-11-29T21:20:41.037276",
+      "metadata": {
+        "step": "task_generation"
+      }
+    },
+    {
+      "id": "2a22b908-aa22-458e-986a-d0f91ef2a33f",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "📞 Zaczynam dzwonić do lokal/restaurację...\n\nMam 3 opcji do wypróbowania.",
+      "timestamp": "2025-11-29T21:20:41.076419",
+      "metadata": {
+        "task_id": "party-restaurant-05392259",
+        "step": "task_start"
+      }
+    },
+    {
+      "id": "c5f728f4-3688-40ca-9bfe-63bb441512e4",
+      "conversation_id": "5334ceb2-8a6a-4028-bb67-4824b664260b",
+      "role": "assistant",
+      "content": "📞 Dzwonię do: **Moonsfera**\n📱 Numer: +48886859039\n\n📝 **Instrukcje dla agenta:**\nDzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.\n\n⏳ Czekam na połączenie...",
+      "timestamp": "2025-11-29T21:20:41.077970",
+      "metadata": {
+        "task_id": "party-restaurant-05392259",
+        "place_name": "Moonsfera",
+        "place_phone": "+48886859039",
+        "step": "calling"
+      }
+    }
+  ],
+  "created_at": "2025-11-29T21:19:31.092721",
+  "updated_at": "2025-11-29T21:20:41.078208",
+  "status": "active"
+}

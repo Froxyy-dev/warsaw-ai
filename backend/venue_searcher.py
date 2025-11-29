@@ -49,14 +49,14 @@ Jeśli nie ma www, użyj: "brak strony"
         self.llm_client = LLMClient(model=model)
         logger.info(f"VenueSearcher initialized with model {model}")
     
-    def search_venues(
+    async def search_venues(
         self, 
         location: str, 
         query_type: str = "lokale z salami/restauracje", 
         count: int = 3
     ) -> VenueSearchResult:
         """
-        Search for venues using Google Search
+        Search for venues using Google Search (ASYNC - non-blocking)
         
         Args:
             location: City/location (e.g. "Warszawa")
@@ -67,7 +67,7 @@ Jeśli nie ma www, użyj: "brak strony"
             VenueSearchResult with list of venues
         """
         try:
-            logger.info(f"Searching for {count} venues: {query_type} in {location}")
+            logger.info(f"🔍 Searching for {count} venues: {query_type} in {location}")
             
             # Format the prompt
             prompt = self.VENUE_SEARCH_PROMPT.format(
@@ -75,13 +75,15 @@ Jeśli nie ma www, użyj: "brak strony"
                 location=location
             )
             
-            # Send to LLM with Google Search tool
-            response = self.llm_client.send(prompt)
+            # ✅ ASYNC call - won't block event loop
+            logger.info(f"📡 Calling LLM with Google Search...")
+            response = await self.llm_client.send_async(prompt)
+            logger.info(f"✅ LLM responded, parsing results...")
             
             # Parse the response
             venues = self._parse_search_results(response, venue_type="restaurant")
             
-            logger.info(f"Found {len(venues)} venues")
+            logger.info(f"✅ Found {len(venues)} venues")
             
             return VenueSearchResult(
                 venues=venues[:count],  # Limit to requested count
@@ -91,7 +93,7 @@ Jeśli nie ma www, użyj: "brak strony"
             )
             
         except Exception as e:
-            logger.error(f"Failed to search venues: {e}")
+            logger.error(f"❌ Failed to search venues: {e}", exc_info=True)
             # Return empty result on error
             return VenueSearchResult(
                 venues=[],
@@ -100,9 +102,9 @@ Jeśli nie ma www, użyj: "brak strony"
                 searched_at=datetime.now()
             )
     
-    def search_bakeries(self, location: str, count: int = 3) -> VenueSearchResult:
+    async def search_bakeries(self, location: str, count: int = 3) -> VenueSearchResult:
         """
-        Search for bakeries using Google Search
+        Search for bakeries using Google Search (ASYNC - non-blocking)
         
         Args:
             location: City/location (e.g. "Warszawa")
@@ -112,7 +114,7 @@ Jeśli nie ma www, użyj: "brak strony"
             VenueSearchResult with list of bakeries
         """
         try:
-            logger.info(f"Searching for {count} bakeries in {location}")
+            logger.info(f"🔍 Searching for {count} bakeries in {location}")
             
             # Format the prompt for bakeries
             prompt = self.VENUE_SEARCH_PROMPT.format(
@@ -120,13 +122,15 @@ Jeśli nie ma www, użyj: "brak strony"
                 location=location
             )
             
-            # Send to LLM with Google Search tool
-            response = self.llm_client.send(prompt)
+            # ✅ ASYNC call - won't block event loop
+            logger.info(f"📡 Calling LLM with Google Search...")
+            response = await self.llm_client.send_async(prompt)
+            logger.info(f"✅ LLM responded, parsing results...")
             
             # Parse the response
             bakeries = self._parse_search_results(response, venue_type="bakery")
             
-            logger.info(f"Found {len(bakeries)} bakeries")
+            logger.info(f"✅ Found {len(bakeries)} bakeries")
             
             return VenueSearchResult(
                 venues=bakeries[:count],  # Limit to requested count
@@ -136,7 +140,7 @@ Jeśli nie ma www, użyj: "brak strony"
             )
             
         except Exception as e:
-            logger.error(f"Failed to search bakeries: {e}")
+            logger.error(f"❌ Failed to search bakeries: {e}", exc_info=True)
             # Return empty result on error
             return VenueSearchResult(
                 venues=[],

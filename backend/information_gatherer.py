@@ -43,9 +43,17 @@ Gdy zebrano WSZYSTKO, zwróć JSON:
         self.llm_client = LLMClient(model=model, system_instruction=self.system_prompt)
 
     def process_message(self, message: str):
+        """Sync version - for backwards compatibility"""
         response = self.llm_client.send(message)
-        text = response
-        
+        return self._parse_response(response)
+    
+    async def process_message_async(self, message: str):
+        """Async version - non-blocking"""
+        response = await self.llm_client.send_async(message)
+        return self._parse_response(response)
+    
+    def _parse_response(self, text: str):
+        """Parse LLM response to extract structured data"""
         # Check for JSON
         json_match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
         

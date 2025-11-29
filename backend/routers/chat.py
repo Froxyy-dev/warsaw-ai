@@ -102,42 +102,77 @@ async def send_message(
     3. Saves the AI response
     4. Returns the AI response
     """
+    logger.info(f"📥 Received message request for conversation {conversation_id}")
+    logger.info(f"📝 Message content: {message_request.content[:50]}...")
+    
     try:
         # Check if conversation exists
+        logger.info(f"🔍 Checking if conversation {conversation_id} exists...")
         if not storage_manager.conversation_exists(conversation_id):
+            logger.error(f"❌ Conversation {conversation_id} not found")
             raise HTTPException(
                 status_code=404,
                 detail=f"Conversation {conversation_id} not found"
             )
+        logger.info(f"✅ Conversation exists")
         
-        # Process message and generate AI response
-        user_message, assistant_message = await chat_service.process_user_message(
-            conversation_id,
-            message_request.content
+        # FIRST: Save user message IMMEDIATELY (before LLM processing)
+        # This allows frontend to see the user message while waiting for response
+        import uuid
+        from datetime import datetime
+        from models import MessageRole
+        
+        logger.info(f"💾 Creating user message...")
+        user_message = Message(
+            id=str(uuid.uuid4()),
+            conversation_id=conversation_id,
+            role=MessageRole.USER,
+            content=message_request.content,
+            timestamp=datetime.utcnow()
         )
         
-        # Save user message (synchronously)
-        storage_manager.add_message_to_conversation(
+        logger.info(f"💾 Saving user message to storage...")
+        success = storage_manager.add_message_to_conversation(
             conversation_id,
             user_message
         )
+        if not success:
+            logger.error(f"❌ Failed to save user message!")
+            raise HTTPException(status_code=500, detail="Failed to save user message")
+        logger.info(f"✅ User message saved to conversation {conversation_id}")
         
-        # Save assistant message (synchronously)
-        storage_manager.add_message_to_conversation(
+        # NOW: Process message and generate AI response (this takes time)
+        logger.info(f"🤖 Starting AI processing for conversation {conversation_id}...")
+        try:
+            _, assistant_message = await chat_service.process_user_message(
+                conversation_id,
+                message_request.content
+            )
+            logger.info(f"✅ AI processing complete")
+        except Exception as ai_error:
+            logger.error(f"❌ AI processing failed: {ai_error}", exc_info=True)
+            raise HTTPException(status_code=500, detail=f"AI processing failed: {str(ai_error)}")
+        
+        # Save assistant message
+        logger.info(f"💾 Saving assistant message...")
+        success = storage_manager.add_message_to_conversation(
             conversation_id,
             assistant_message
         )
-        
-        logger.info(f"Sent message to conversation {conversation_id}")
+        if not success:
+            logger.error(f"❌ Failed to save assistant message!")
+            raise HTTPException(status_code=500, detail="Failed to save assistant message")
+        logger.info(f"✅ Assistant message saved to conversation {conversation_id}")
         
         # Return assistant message
+        logger.info(f"📤 Returning assistant message")
         return assistant_message
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to send message to conversation {conversation_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"❌ CRITICAL ERROR in send_message: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
 @router.delete("/conversations/{conversation_id}")

@@ -51,47 +51,68 @@ export function ChatWindow() {
 
   // Auto-refresh conversation when backend is processing
   useEffect(() => {
-    if (isSearching && conversationId) {
-      console.log('🔄 Starting auto-refresh - backend is processing...');
-      
-      let refreshCount = 0;
-      autoRefreshInterval.current = setInterval(async () => {
-        try {
-          refreshCount++;
-          console.log(`🔄 Auto-refresh #${refreshCount}...`);
-          const conv = await getConversation(conversationId);
+    if (!isSearching || !conversationId) {
+      return;
+    }
+
+    console.log('🔄 Starting auto-refresh for conversation:', conversationId);
+    console.log('📊 Current messages count:', messages.length);
+    
+    let refreshCount = 0;
+    let previousMessageCount = messages.length;
+    
+    const intervalId = setInterval(async () => {
+      try {
+        refreshCount++;
+        console.log(`🔄 Auto-refresh #${refreshCount} - fetching conversation ${conversationId}...`);
+        
+        const conv = await getConversation(conversationId);
+        console.log(`📥 Received conversation with ${conv.messages.length} messages`);
+        
+        // ALWAYS update messages in state - to jest kluczowe!
+        setMessages(conv.messages);
+        
+        // Check if we got NEW messages
+        if (conv.messages.length > previousMessageCount) {
+          console.log(`✨ New messages detected! (${previousMessageCount} -> ${conv.messages.length})`);
+          previousMessageCount = conv.messages.length;
           
-          // Update messages
-          setMessages(conv.messages);
-          
-          // Check if we got a new assistant message
           const lastMessage = conv.messages[conv.messages.length - 1];
-          if (lastMessage && lastMessage.role === 'assistant') {
+          console.log('📨 Last message:', { role: lastMessage.role, preview: lastMessage.content.substring(0, 50) });
+          
+          // If last message is from assistant, we're done!
+          if (lastMessage.role === 'assistant') {
             console.log('✅ Got assistant response! Stopping auto-refresh');
             setIsLoading(false);
             setIsSearching(false);
+            clearInterval(intervalId);
+            return;
           }
-          
-          // Safety: stop after 5 minutes (150 refreshes at 2s intervals)
-          if (refreshCount > 150) {
-            console.log('⏱️ Auto-refresh timeout - stopping');
-            setIsLoading(false);
-            setIsSearching(false);
-          }
-        } catch (err) {
-          console.error('❌ Auto-refresh failed:', err);
+        } else {
+          console.log('⏳ No new messages yet, continuing to poll...');
         }
-      }, 2000); // Refresh every 2 seconds
+        
+        // Safety timeout: 5 minutes (60 * 5 seconds = 300 seconds)
+        if (refreshCount > 60) {
+          console.log('⏱️ Auto-refresh timeout after 5 minutes');
+          setIsLoading(false);
+          setIsSearching(false);
+          clearInterval(intervalId);
+        }
+      } catch (err) {
+        console.error('❌ Auto-refresh failed:', err);
+      }
+    }, 5000); // Refresh every 5 seconds (reduced from 2s to avoid race conditions)
 
-      return () => {
-        if (autoRefreshInterval.current) {
-          console.log('⏹️ Stopping auto-refresh');
-          clearInterval(autoRefreshInterval.current);
-          autoRefreshInterval.current = null;
-        }
-      };
-    }
-  }, [isSearching, conversationId]);
+    autoRefreshInterval.current = intervalId;
+
+    return () => {
+      console.log('⏹️ Cleanup: stopping auto-refresh');
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isSearching, conversationId, messages.length]);
 
   // Focus input on mount
   useEffect(() => {
@@ -135,43 +156,27 @@ export function ChatWindow() {
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-    setIsSearching(true);  // Enable auto-refresh immediately
 
     try {
       // Ensure conversation exists
       const convId = await ensureConversation();
       console.log('✅ Conversation ID:', convId);
       
-      // Send message to backend (starts processing in background)
-      console.log('📤 Sending message:', messageContent);
+      // Send message to backend (this is async - backend will process in background)
+      console.log('📤 Sending message to backend:', messageContent);
+      
+      // Start auto-refresh BEFORE sending - to catch updates
+      setIsSearching(true);
+      
+      // Send the message (this triggers backend processing)
       await sendMessageApi(convId, messageContent);
-      console.log('✅ Message sent, backend is processing...');
+      console.log('✅ Message sent to backend - processing started');
+      console.log('🔄 Auto-refresh is now active and will fetch updates every 2 seconds');
 
-      // Keep loading and auto-refresh active
-      // Auto-refresh will update messages every 2 seconds
-      // We'll stop when we detect the assistant's response
-      
-      // Wait a bit for initial processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // First manual refresh to get the assistant's response
-      const updatedConv = await getConversation(convId);
-      console.log('📥 First refresh - messages:', updatedConv.messages.length);
-      setMessages(updatedConv.messages || []);
-      
-      // Check if assistant has responded
-      const hasAssistantResponse = updatedConv.messages.some(
-        (msg, idx) => msg.role === 'assistant' && idx > messages.length - 1
-      );
-      
-      if (!hasAssistantResponse) {
-        console.log('⏳ Waiting for assistant response... auto-refresh will continue');
-        // Auto-refresh will keep running until isSearching is set to false
-      } else {
-        console.log('✅ Got assistant response');
-        setIsLoading(false);
-        setIsSearching(false);
-      }
+      // Note: Auto-refresh useEffect will now take over and:
+      // 1. Fetch conversation every 2 seconds
+      // 2. Update messages in UI
+      // 3. Stop when assistant responds
 
     } catch (err: any) {
       console.error('❌ Failed to send message:', err);

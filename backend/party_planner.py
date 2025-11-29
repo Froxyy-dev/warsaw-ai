@@ -225,7 +225,7 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
         
         self.state = PlanState.GATHERING
         
-        # Get first question from gatherer
+        # Get first question from gatherer (sync OK here - initialization)
         first_question = self.info_gatherer.process_message("Zacznij zbieranie danych")
         
         return f"""✅ Plan zatwierdzony!
@@ -236,7 +236,7 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
     
     async def process_gathering(self, user_input: str) -> Tuple[str, bool]:
         """
-        Process user input during gathering phase
+        Process user input during gathering phase (ASYNC non-blocking)
         
         Returns:
             (response, is_complete)
@@ -244,7 +244,8 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
         if not self.info_gatherer:
             return "Błąd: Brak aktywnego zbierania danych", False
         
-        result = self.info_gatherer.process_message(user_input)
+        # ✅ ASYNC call - won't block event loop
+        result = await self.info_gatherer.process_message_async(user_input)
         
         if result["type"] == "complete":
             # Gathering complete - transition to SEARCHING
@@ -327,7 +328,7 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
     
     async def search_venues_only(self) -> str:
         """
-        Search for venues only (first step)
+        Search for venues only (first step) - ASYNC non-blocking
         
         Returns:
             Response message with venue results
@@ -336,8 +337,8 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             location = self.gathered_info.get("location", "Warszawa")
             logger.info(f"🔍 Searching for venues in {location}")
             
-            # Search for venues
-            venue_results = self.venue_searcher.search_venues(
+            # ✅ ASYNC call with await
+            venue_results = await self.venue_searcher.search_venues(
                 location=location,
                 query_type="lokale z salami/restauracje",
                 count=3
@@ -357,12 +358,12 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             return response
             
         except Exception as e:
-            logger.error(f"Error during venue search: {e}")
+            logger.error(f"❌ Error during venue search: {e}", exc_info=True)
             return f"❌ Błąd podczas wyszukiwania lokali: {str(e)}"
     
     async def search_bakeries_only(self) -> str:
         """
-        Search for bakeries only (second step)
+        Search for bakeries only (second step) - ASYNC non-blocking
         
         Returns:
             Response message with bakery results
@@ -371,8 +372,8 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             location = self.gathered_info.get("location", "Warszawa")
             logger.info(f"🔍 Searching for bakeries in {location}")
             
-            # Search for bakeries
-            bakery_results = self.venue_searcher.search_bakeries(
+            # ✅ ASYNC call with await
+            bakery_results = await self.venue_searcher.search_bakeries(
                 location=location,
                 count=3
             )
@@ -391,7 +392,7 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             return response
             
         except Exception as e:
-            logger.error(f"Error during bakery search: {e}")
+            logger.error(f"❌ Error during bakery search: {e}", exc_info=True)
             return f"❌ Błąd podczas wyszukiwania cukierni: {str(e)}"
     
     async def generate_and_save_tasks(self) -> str:

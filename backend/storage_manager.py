@@ -36,7 +36,7 @@ class StorageManager:
     
     def save_conversation(self, conversation: Conversation) -> bool:
         """
-        Save a conversation to disk.
+        Save a conversation to disk with file locking to prevent race conditions.
         Returns True on success, False on failure.
         """
         lock = self._get_lock(conversation.id)
@@ -51,6 +51,8 @@ class StorageManager:
                 # Write to temp file first (atomic operation)
                 with open(temp_path, 'w', encoding='utf-8') as f:
                     json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+                    f.flush()  # Ensure data is written to disk
+                    os.fsync(f.fileno())  # Force write to disk
                 
                 # Rename temp file to actual file (atomic on POSIX systems)
                 temp_path.replace(file_path)
@@ -67,7 +69,7 @@ class StorageManager:
     
     def load_conversation(self, conversation_id: str) -> Optional[Conversation]:
         """
-        Load a conversation from disk.
+        Load a conversation from disk with file locking to prevent race conditions.
         Returns None if not found or error occurs.
         """
         lock = self._get_lock(conversation_id)

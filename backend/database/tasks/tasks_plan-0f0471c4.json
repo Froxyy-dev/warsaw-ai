@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-0f0471c4",
+  "conversation_id": "",
+  "created_at": "2025-11-29T20:42:00.250510",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-8b73f205",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Alewino",
+          "phone": "+48 22 628 38 30"
+        },
+        {
+          "name": "Flaming & Co.",
+          "phone": "+48 724 234 234"
+        },
+        {
+          "name": "Warszawa Wschodnia by Mateusz Gessler",
+          "phone": "+48 577 376 773"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-4543d97e",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Napis na torcie: \"Wszystkiego najlepszego Ada\"\n- Data odbioru: 2025-12-01\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "Cukiernia Sowa",
+          "phone": "+48 516 054 724"
+        },
+        {
+          "name": "Cukiernia Lukullus",
+          "phone": "+48 726 262 600"
+        },
+        {
+          "name": "DESEO Patisserie & Chocolaterie",
+          "phone": "+48 607 077 727"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

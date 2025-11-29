@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-5b64104b",
+  "conversation_id": "",
+  "created_at": "2025-11-29T20:34:15.641379",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-9af94cf1",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Restauracja Kameralna",
+          "phone": "+48 517 127 167"
+        },
+        {
+          "name": "Guru Restauracja i Bar",
+          "phone": "+48 22 857 0604"
+        },
+        {
+          "name": "Restauracja Florian - Ogień i Woda",
+          "phone": "+48 510 124 460"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-64871bc0",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Data odbioru: 2025-12-01\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "Cukiernia A. Blikle",
+          "phone": "+48 661 335 210"
+        },
+        {
+          "name": "Cukiernia Lukullus",
+          "phone": "+48 726 26 26 01"
+        },
+        {
+          "name": "Cukiernie Sowa",
+          "phone": "+48 690 484 090"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

@@ -5,6 +5,7 @@ Handles: call initiation, transcript fetching, LLM analysis, multi-place orchest
 import os
 import requests
 import time
+import asyncio
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 
@@ -309,7 +310,7 @@ Zwróć TYLKO JSON.
 
 def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str, Any]:
     """
-    Analizuje transkrypt używając LLM.
+    Analizuje transkrypt używając LLM (SYNC version - for backwards compatibility).
     
     Args:
         task: Zadanie
@@ -320,7 +321,7 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
         Dict z analizą
     """
     print(f"\n{'='*60}")
-    print("🤖 Analyzing transcript with LLM...")
+    print("🤖 Analyzing transcript with LLM (SYNC)...")
     print(f"{'='*60}\n")
     
     prompt = create_analysis_prompt(task, place, transcript)
@@ -337,32 +338,87 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
         print(f"🔄 Sending to LLM (gemini-2.5-flash)...")
         llm_client = LLMClient(model="gemini-2.5-flash")
         response = llm_client.send(prompt)
+        return _parse_llm_analysis(response)
         
-        # 🔍 VERBOSE: Show raw response
+    except Exception as e:
+        print(f"\n❌ ERROR during LLM analysis: {e}\n")
+        return {
+            "success": False,
+            "should_continue": True,
+            "reason": f"LLM analysis failed: {str(e)}",
+            "confidence": 0.0
+        }
+
+
+async def analyze_call_with_llm_async(task: Task, place: Place, transcript: str) -> Dict[str, Any]:
+    """
+    Analizuje transkrypt używając LLM (ASYNC version - non-blocking).
+    
+    Args:
+        task: Zadanie
+        place: Miejsce
+        transcript: Transkrypt rozmowy
+        
+    Returns:
+        Dict z analizą
+    """
+    print(f"\n{'='*60}")
+    print("🤖 Analyzing transcript with LLM (ASYNC)...")
+    print(f"{'='*60}\n")
+    
+    prompt = create_analysis_prompt(task, place, transcript)
+    
+    # 🔍 VERBOSE: Show prompt summary
+    print(f"📝 Prompt summary:")
+    print(f"   Place: {place.name}")
+    print(f"   Goal: {task.notes_for_agent[:100]}...")
+    print(f"   Transcript length: {len(transcript)} characters")
+    print(f"   Prompt length: {len(prompt)} characters\n")
+    
+    # ✅ ASYNC call - won't block event loop
+    try:
+        print(f"🔄 Sending to LLM (gemini-2.5-flash) ASYNC...")
+        llm_client = LLMClient(model="gemini-2.5-flash")
+        response = await llm_client.send_async(prompt)
+        return _parse_llm_analysis(response)
+        
+    except Exception as e:
+        print(f"\n❌ ERROR during LLM analysis: {e}\n")
+        return {
+            "success": False,
+            "should_continue": True,
+            "reason": f"LLM analysis failed: {str(e)}",
+            "confidence": 0.0
+        }
+
+
+def _parse_llm_analysis(response: str) -> Dict[str, Any]:
+    """Parse LLM response into structured analysis"""
+    import json
+    import re
+    
+    # 🔍 VERBOSE: Show raw response (only if not already shown)
+    if "📨 Raw LLM response:" not in str(locals()):
         print(f"\n📨 Raw LLM response:")
         print(f"{'='*60}")
         print(response[:500])  # First 500 chars
         if len(response) > 500:
             print(f"... (total {len(response)} chars)")
         print(f"{'='*60}\n")
-        
-        # Parse JSON response - try code block first (LLM often wraps in markdown)
-        import json
-        import re
-        
-        llm_result = None
-        
-        # Try 1: Extract from markdown code block (most common)
-        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
-        if json_match:
-            print(f"✅ Extracting JSON from markdown code block...")
-            try:
-                llm_result = json.loads(json_match.group(1))
-            except json.JSONDecodeError as e:
-                print(f"⚠️  Failed to parse JSON from code block: {e}")
-        
-        # Try 2: Parse entire response as JSON (if not wrapped)
-        if not llm_result:
+    
+    llm_result = None
+    
+    # Try 1: Extract from markdown code block (most common)
+    json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
+    if json_match:
+        print(f"✅ Extracting JSON from markdown code block...")
+        try:
+            llm_result = json.loads(json_match.group(1))
+        except json.JSONDecodeError as e:
+            print(f"⚠️  Failed to parse JSON from code block: {e}")
+    
+    # Try 2: Parse entire response as JSON (if not wrapped)
+    if not llm_result:
             try:
                 llm_result = json.loads(response)
                 print(f"✅ Parsed response as raw JSON")

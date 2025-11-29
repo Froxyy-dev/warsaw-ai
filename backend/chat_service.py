@@ -244,6 +244,18 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         if state_before == PlanState.GATHERING and self.party_planner.state == PlanState.SEARCHING:
             logger.info("🔍 Gathering complete, executing search flow step by step...")
             
+            # ✅ PROGRESS MESSAGE #0: Let user know we're starting
+            progress_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content="✅ Świetnie! Mam wszystkie potrzebne dane.\n\n🔍 Zaczynam wyszukiwanie lokali i cukierni...",
+                timestamp=datetime.now(),
+                metadata={"step": "search_starting"}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, progress_msg)
+            logger.info("✅ Progress message saved - user can see we're starting")
+            
             # Step 1: Venue search
             logger.info("🏢 Step 1: Searching venues...")
             venue_response = await self.party_planner.search_venues_only()

@@ -3,6 +3,7 @@ from google import genai
 from google.genai import types
 from typing import Generator, List
 import os
+import asyncio
 load_dotenv()
 
 class LLMClient:
@@ -74,6 +75,20 @@ class LLMClient:
             response_chunks.append(chunk)
         
         return ''.join(response_chunks)
+    
+    async def send_async(self, message: str) -> str:
+        """
+        Async version of send() - runs in thread pool to avoid blocking event loop.
+        
+        Args:
+            message: The message/prompt to send
+            
+        Returns:
+            Complete response string
+        """
+        # Run the blocking send() in a thread pool
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.send, message)
 
     def get_history(self):
         """
