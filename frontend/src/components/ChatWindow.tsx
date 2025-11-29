@@ -54,13 +54,32 @@ export function ChatWindow() {
     if (isSearching && conversationId) {
       console.log('🔄 Starting auto-refresh - backend is processing...');
       
+      let refreshCount = 0;
       autoRefreshInterval.current = setInterval(async () => {
         try {
-          console.log('🔄 Auto-refreshing conversation...');
+          refreshCount++;
+          console.log(`🔄 Auto-refresh #${refreshCount}...`);
           const conv = await getConversation(conversationId);
+          
+          // Update messages
           setMessages(conv.messages);
+          
+          // Check if we got a new assistant message
+          const lastMessage = conv.messages[conv.messages.length - 1];
+          if (lastMessage && lastMessage.role === 'assistant') {
+            console.log('✅ Got assistant response! Stopping auto-refresh');
+            setIsLoading(false);
+            setIsSearching(false);
+          }
+          
+          // Safety: stop after 5 minutes (150 refreshes at 2s intervals)
+          if (refreshCount > 150) {
+            console.log('⏱️ Auto-refresh timeout - stopping');
+            setIsLoading(false);
+            setIsSearching(false);
+          }
         } catch (err) {
-          console.error('Auto-refresh failed:', err);
+          console.error('❌ Auto-refresh failed:', err);
         }
       }, 2000); // Refresh every 2 seconds
 
@@ -68,6 +87,7 @@ export function ChatWindow() {
         if (autoRefreshInterval.current) {
           console.log('⏹️ Stopping auto-refresh');
           clearInterval(autoRefreshInterval.current);
+          autoRefreshInterval.current = null;
         }
       };
     }
@@ -120,30 +140,49 @@ export function ChatWindow() {
     try {
       // Ensure conversation exists
       const convId = await ensureConversation();
-      console.log('Conversation ID:', convId);
+      console.log('✅ Conversation ID:', convId);
       
-      // Send message to backend (may take several minutes)
-      console.log('Sending message:', messageContent);
-      const response = await sendMessageApi(convId, messageContent);
-      console.log('Got response:', response);
+      // Send message to backend (starts processing in background)
+      console.log('📤 Sending message:', messageContent);
+      await sendMessageApi(convId, messageContent);
+      console.log('✅ Message sent, backend is processing...');
 
-      // Reload entire conversation from backend
-      console.log('Reloading conversation...');
+      // Keep loading and auto-refresh active
+      // Auto-refresh will update messages every 2 seconds
+      // We'll stop when we detect the assistant's response
+      
+      // Wait a bit for initial processing
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // First manual refresh to get the assistant's response
       const updatedConv = await getConversation(convId);
-      console.log('Updated conversation:', updatedConv);
+      console.log('📥 First refresh - messages:', updatedConv.messages.length);
       setMessages(updatedConv.messages || []);
+      
+      // Check if assistant has responded
+      const hasAssistantResponse = updatedConv.messages.some(
+        (msg, idx) => msg.role === 'assistant' && idx > messages.length - 1
+      );
+      
+      if (!hasAssistantResponse) {
+        console.log('⏳ Waiting for assistant response... auto-refresh will continue');
+        // Auto-refresh will keep running until isSearching is set to false
+      } else {
+        console.log('✅ Got assistant response');
+        setIsLoading(false);
+        setIsSearching(false);
+      }
 
     } catch (err: any) {
-      console.error('Failed to send message:', err);
+      console.error('❌ Failed to send message:', err);
       console.error('Error details:', err.response?.data || err.message);
       setError(`Error: ${err.response?.data?.detail || err.message || 'Failed to send message'}`);
       // Remove optimistic user message on error
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
       // Restore input value
       setInputValue(messageContent);
-    } finally {
       setIsLoading(false);
-      setIsSearching(false);  // Disable auto-refresh when done
+      setIsSearching(false);
     }
   };
 
@@ -212,9 +251,18 @@ export function ChatWindow() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="max-w-[75%] rounded-2xl rounded-bl-sm px-4 py-3 bg-slate-800 border border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-                    <span className="text-sm text-slate-300">Thinking...</span>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                      <span className="text-sm text-slate-300">
+                        {isSearching ? 'Processing your request...' : 'Thinking...'}
+                      </span>
+                    </div>
+                    {isSearching && (
+                      <div className="text-xs text-slate-500">
+                        This may take a few moments. The assistant is working on your request.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

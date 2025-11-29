@@ -25,9 +25,9 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Chat Panel - Takes 2 columns on large screens */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Chat Panel - Takes 3 columns on large screens */}
+          <div className="lg:col-span-3">
             <Card className="h-[calc(100vh-180px)] flex flex-col bg-slate-900/50 border-slate-800">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Chat</CardTitle>
