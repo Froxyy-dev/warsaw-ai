@@ -19,18 +19,21 @@ class LLMClient:
             
         self.client = genai.Client(api_key=api_key)
         self.model = model
+        self.system_instruction = system_instruction
 
         grounding_tool = types.Tool(
             google_search=types.GoogleSearch()
         )
 
         self.config = types.GenerateContentConfig(
-            tools=[grounding_tool]
+            tools=[grounding_tool],
+            system_instruction=self.system_instruction
         )
 
         
         # Initialize the chat session immediately
         self.chat_session = self.client.chats.create(model=self.model, config=self.config)
+        
     def send_message(self, message: str) -> Generator[str, None, None]:
         """
         Sends a message to the active chat session and streams the response.
