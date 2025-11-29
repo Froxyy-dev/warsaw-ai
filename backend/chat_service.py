@@ -422,11 +422,17 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 
                 # 4. Format and display transcript
                 try:
+                    logger.info(f"📝 Formatting transcript for {place.name}...")
+                    logger.info(f"   Conversation status: {conversation_data.get('status')}")
+                    logger.info(f"   Has transcript key: {bool(conversation_data.get('transcript'))}")
+                    
                     # Debug: Show structure if transcript might be problematic
                     from voice_agent import debug_conversation_structure
                     if not conversation_data.get('transcript'):
                         logger.warning(f"⚠️  No 'transcript' key in conversation data for {place.name}")
                         debug_conversation_structure(conversation_data)
+                    else:
+                        logger.info(f"   Transcript items: {len(conversation_data.get('transcript', []))}")
                     
                     transcript = format_transcript(conversation_data)
                     
@@ -434,6 +440,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     if "Failed to parse transcript" in transcript or "Transcript is empty" in transcript:
                         logger.warning(f"⚠️  Transcript parsing issue for {place.name}")
                         debug_conversation_structure(conversation_data)
+                    else:
+                        logger.info(f"✅ Transcript formatted successfully ({len(transcript)} chars)")
+                        # Show first 200 chars of transcript for verification
+                        logger.info(f"   Preview: {transcript[:200]}...")
                     
                     transcript_msg = Message(
                         id=str(uuid.uuid4()),
@@ -465,7 +475,16 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     continue  # Try next place
                 
                 # 5. Analyze with LLM
+                logger.info(f"🤖 Analyzing call with LLM...")
+                logger.info(f"   Transcript length for analysis: {len(transcript)} chars")
+                
                 analysis = analyze_call_with_llm(task, place, transcript)
+                
+                logger.info(f"✅ LLM analysis complete!")
+                logger.info(f"   Success: {analysis.get('success')}")
+                logger.info(f"   Should continue: {analysis.get('should_continue')}")
+                logger.info(f"   Confidence: {analysis.get('confidence', 0.0):.2f}")
+                logger.info(f"   Reason: {analysis.get('reason', 'N/A')[:100]}")
                 
                 # 6. Send analysis result
                 if analysis['success'] and not analysis['should_continue']:

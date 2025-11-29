@@ -325,17 +325,62 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
     
     prompt = create_analysis_prompt(task, place, transcript)
     
+    # 🔍 VERBOSE: Show prompt summary
+    print(f"📝 Prompt summary:")
+    print(f"   Place: {place.name}")
+    print(f"   Goal: {task.notes_for_agent[:100]}...")
+    print(f"   Transcript length: {len(transcript)} characters")
+    print(f"   Prompt length: {len(prompt)} characters\n")
+    
     # Wywołaj LLM
     try:
+        print(f"🔄 Sending to LLM (gemini-2.5-flash)...")
         llm_client = LLMClient(model="gemini-2.5-flash")
         response = llm_client.send(prompt)
         
+        # 🔍 VERBOSE: Show raw response
+        print(f"\n📨 Raw LLM response:")
+        print(f"{'='*60}")
+        print(response[:500])  # First 500 chars
+        if len(response) > 500:
+            print(f"... (total {len(response)} chars)")
+        print(f"{'='*60}\n")
+        
         # Parse JSON response
         import json
-        llm_result = json.loads(response)
+        try:
+            llm_result = json.loads(response)
+        except json.JSONDecodeError as je:
+            print(f"❌ JSON parsing error: {je}")
+            print(f"   Response was not valid JSON")
+            print(f"   Trying to extract JSON from response...\n")
+            
+            # Try to extract JSON from markdown code blocks
+            import re
+            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
+            if json_match:
+                print(f"✅ Found JSON in code block, parsing...")
+                llm_result = json.loads(json_match.group(1))
+            else:
+                # Try to find raw JSON
+                json_match = re.search(r'(\{.*\})', response, re.DOTALL)
+                if json_match:
+                    print(f"✅ Found raw JSON, parsing...")
+                    llm_result = json.loads(json_match.group(1))
+                else:
+                    raise ValueError("Could not find JSON in response")
         
+        # 🔍 VERBOSE: Show parsed result
         print(f"✅ Analysis complete!")
-        print(f"   Model: gemini-2.5-flash\n")
+        print(f"   Model: gemini-2.5-flash")
+        print(f"\n📊 Parsed result:")
+        print(f"   ✓ Success: {llm_result.get('success', False)}")
+        print(f"   ✓ Should continue: {llm_result.get('should_continue', True)}")
+        print(f"   ✓ Confidence: {llm_result.get('confidence', 0.0):.2f}")
+        print(f"   ✓ Reason: {llm_result.get('reason', 'N/A')[:100]}")
+        if llm_result.get('appointment_details'):
+            print(f"   ✓ Details: {llm_result.get('appointment_details')}")
+        print()
         
         return {
             "success": llm_result.get("success", False),
@@ -343,10 +388,19 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
             "reason": llm_result.get("reason", "No reason provided"),
             "confidence": llm_result.get("confidence", 0.0),
             "appointment_details": llm_result.get("appointment_details", {}),
-            "llm_response": llm_result
+            "llm_response": llm_result,
+            "llm_raw_response": response  # Keep raw for debugging
         }
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing failed: {e}")
+        print(f"   Could not parse LLM response as JSON")
+        print(f"   Raw response: {response[:200]}...")
+        llm_result = None
     except Exception as e:
-        print(f"⚠️  LLM error: {e}")
+        print(f"❌ LLM error: {e}")
+        import traceback
+        print(f"   Traceback:")
+        traceback.print_exc()
         llm_result = None
     
     if not llm_result:
