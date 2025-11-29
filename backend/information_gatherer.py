@@ -11,19 +11,6 @@ from llm_client import LLMClient
 
 load_dotenv()
 
-import os
-import json
-import re
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-from llm_client import LLMClient
-
-load_dotenv()
-
 class InformationGatherer:
     def __init__(self, model: str = "gemini-2.5-flash"):
         self.system_prompt = """
