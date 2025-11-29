@@ -343,6 +343,138 @@ class StorageManager:
         except Exception as e:
             logger.error(f"Failed to delete plan {plan_id}: {e}")
             return False
+    
+    # ===== Task List Storage Methods =====
+    
+    def _get_task_list_file_path(self, plan_id: str) -> Path:
+        """Get the file path for a task list"""
+        tasks_path = self.base_path.parent / "tasks"
+        tasks_path.mkdir(parents=True, exist_ok=True)
+        return tasks_path / f"tasks_{plan_id}.json"
+    
+    def save_task_list(self, tasks: list, plan_id: str, conversation_id: str = "") -> bool:
+        """
+        Save task list to disk
+        
+        Args:
+            tasks: List of Task objects (from task.py)
+            plan_id: ID of the associated plan
+            conversation_id: ID of the conversation
+            
+        Returns:
+            True on success, False on failure
+        """
+        from models import TaskListStorage
+        
+        lock = self._get_lock(f"tasks_{plan_id}")
+        file_path = self._get_task_list_file_path(plan_id)
+        temp_path = file_path.with_suffix('.tmp')
+        
+        try:
+            with lock:
+                # Convert Task objects to dicts
+                task_dicts = [self._task_to_dict(task) for task in tasks]
+                
+                # Create storage object
+                task_list_storage = TaskListStorage(
+                    plan_id=plan_id,
+                    conversation_id=conversation_id,
+                    created_at=datetime.now(),
+                    tasks=task_dicts,
+                    status="pending"
+                )
+                
+                # Convert to dict for JSON serialization
+                data = task_list_storage.model_dump(mode='json')
+                
+                # Write to temp file first
+                with open(temp_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+                
+                # Rename temp file to actual file (atomic)
+                temp_path.replace(file_path)
+                
+                logger.info(f"Saved task list for plan {plan_id} ({len(tasks)} tasks)")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to save task list for plan {plan_id}: {e}")
+            if temp_path.exists():
+                temp_path.unlink()
+            return False
+    
+    def load_task_list(self, plan_id: str) -> Optional[list]:
+        """
+        Load task list from disk
+        
+        Args:
+            plan_id: ID of the plan
+            
+        Returns:
+            List of Task objects or None if not found
+        """
+        lock = self._get_lock(f"tasks_{plan_id}")
+        file_path = self._get_task_list_file_path(plan_id)
+        
+        try:
+            with lock:
+                if not file_path.exists():
+                    logger.warning(f"Task list for plan {plan_id} not found")
+                    return None
+                
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                # Extract tasks and convert back to Task objects
+                task_dicts = data.get('tasks', [])
+                tasks = [self._dict_to_task(task_dict) for task_dict in task_dicts]
+                
+                logger.info(f"Loaded task list for plan {plan_id} ({len(tasks)} tasks)")
+                return tasks
+                
+        except Exception as e:
+            logger.error(f"Failed to load task list for plan {plan_id}: {e}")
+            return None
+    
+    def _task_to_dict(self, task) -> dict:
+        """
+        Convert Task dataclass to dict for JSON storage
+        
+        Args:
+            task: Task object from task.py
+            
+        Returns:
+            Dictionary representation
+        """
+        return {
+            "task_id": task.task_id,
+            "notes_for_agent": task.notes_for_agent,
+            "places": [
+                {"name": place.name, "phone": place.phone}
+                for place in task.places
+            ]
+        }
+    
+    def _dict_to_task(self, data: dict):
+        """
+        Convert dict back to Task dataclass
+        
+        Args:
+            data: Dictionary representation
+            
+        Returns:
+            Task object
+        """
+        from task import Task, Place
+        
+        return Task(
+            task_id=data["task_id"],
+            notes_for_agent=data["notes_for_agent"],
+            places=[
+                Place(name=p["name"], phone=p["phone"])
+                for p in data["places"]
+            ]
+        )
 
 
 # Global instance

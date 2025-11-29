@@ -1,19 +1,18 @@
-Daję Ci przykład story, które chcemy zaimplementować w aktualnym systemie:
+Dobra, to teraz musimy włączyć naszego voice agenta do pracy, pamiętaj że na potrzeby POC numer telefonu będzie zhardocownay i będzie to +48886859039 i musimy być taki cały czas nie będziemy narazie nigdzie indziej dzwonić.
 
-USER: Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę na 10 osób.
+Jak chcę to włączyć, musisz po pierwsze mówić userowi co robisz czyli powinieneś dać informację na chat dzwonię do X np lokal i informacje o tym lokalu, oprocz tego jakie mam np notatki dla agenta podczas tego callu i chcemy zeby user to widzial.
 
-(Musimy zrobić call do LLMa z promptem: tutaj masz sytuacje, w której masz pomóc uzytkownikowi, zaproponuj plan imprezy, i dopytaj uzytkownika o potrzebne informacje  ktore wykorzystasz podczas dzwonienia np. gdy masz zarezerwowac sale to potrzebujesz nazwiska  numeru telefonu)
+Nastepenie jak dzwonimy to chcemy uzyskac transkrypt zeby po zakonczeniu rozmowy ten transkrypt moc wyswietlic.
 
-AGENT: Tutaj jest przykladowy plan  wyswietlam plan, czy chcesz cos dostasowac czy potiwerdzasz?
+Wyswietlaj transkrypt dla uzytkownika.
 
-USER: Do rezerwacji sali chce dorzucic balony  a tort chce zeby byl w dedykowanej cukierni zrobiony
+Pamietaj ze powinno to wygladac w petli czyli:
+Bierzemy pierwsze miejsce z listy
+Wyswietlamy dla uzytkownika ze tam dzwonimy
+Dzwonimy tam i zapisujemy transkrypt
+Jak zakonczymy rozmowe wyswietlamy transkrypt dla uzytkownika
+Decydujemy czy udalo nam sie nasz plan zrealizowac
+jak tak to przechodzimy dalej czyli podsumiwujemy co sie stalo dla uzytkownika
+jak nie to dzwonimy do kolejnego miejsca
 
-(Call do llm z aktualnym planem i feedbackiem uzytkownika zeby poprawil i stworzyl plan)
-
-AGENT: oto poprawiony plan  wyswietl plan  czy chcesz cos dostosowac czy potwierdzasz
-
-USER: potwierdzam
-
-Jak chce to wpleść w system. Zobacz sobie klasę information gatherer tam jest opis jak możemy to zrobić wysokopoziomowo. Chcemy tak naprawdę, żeby ten powyższy scenariusz nam wyszedł bo jest to demo na potrzeby hackathonu. 
-
-Flow jest tam zrobione w jaki sposob odnosze sie do tego teraz potrzebuje zintegrowac to z frontendem zebysmy dali rade zebrac od uzytkownika potrzebne informacje
+i tak iteraujemy sie po naszych 2 taskach ktore mamy czyli dla lokalu i dla cukierni

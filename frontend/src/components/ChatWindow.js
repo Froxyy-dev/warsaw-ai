@@ -8,9 +8,11 @@ function ChatWindow() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [conversationId, setConversationId] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const initialized = useRef(false);
+  const autoRefreshInterval = useRef(null);
 
   // Initialize - load existing conversation or prepare for new one
   useEffect(() => {
@@ -38,6 +40,40 @@ function ChatWindow() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-refresh conversation when searching
+  useEffect(() => {
+    if (isSearching && conversationId) {
+      console.log('🔄 Starting auto-refresh (searching venues/bakeries)...');
+      
+      autoRefreshInterval.current = setInterval(async () => {
+        try {
+          console.log('🔄 Auto-refreshing conversation...');
+          const conv = await getConversation(conversationId);
+          setMessages(conv.messages);
+          
+          // Check if we're still searching by looking at last message
+          const lastMsg = conv.messages[conv.messages.length - 1];
+          if (lastMsg && (
+              lastMsg.content.includes('🎉 Wszystko gotowe') ||
+              lastMsg.content.includes('🎉 Zakończono wszystkie zadania')
+          )) {
+            console.log('✅ Process complete, stopping auto-refresh');
+            setIsSearching(false);
+          }
+        } catch (err) {
+          console.error('Auto-refresh failed:', err);
+        }
+      }, 2000); // Refresh every 2 seconds
+
+      return () => {
+        if (autoRefreshInterval.current) {
+          console.log('⏹️ Stopping auto-refresh');
+          clearInterval(autoRefreshInterval.current);
+        }
+      };
+    }
+  }, [isSearching, conversationId]);
 
   // Focus input on mount
   useEffect(() => {
@@ -97,6 +133,16 @@ function ChatWindow() {
       const updatedConv = await getConversation(convId);
       console.log('Updated conversation:', updatedConv);
       setMessages(updatedConv.messages || []);
+
+      // Check if backend is processing - if so, start auto-refresh
+      const lastMessage = updatedConv.messages[updatedConv.messages.length - 1];
+      if (lastMessage && (
+          lastMessage.content.includes('🔍 Zaczynam wyszukiwanie') ||
+          lastMessage.content.includes('📞 Rozpoczynam wykonywanie')
+      )) {
+        console.log('🔍 Detected active processing, enabling auto-refresh');
+        setIsSearching(true);
+      }
 
     } catch (err) {
       console.error('Failed to send message:', err);

@@ -3,6 +3,7 @@ Chat Service for handling chat conversations with LLM integration.
 Manages context, processes messages, and generates AI responses.
 """
 import logging
+import asyncio
 from datetime import datetime
 from typing import List, Optional, Tuple
 import uuid
@@ -27,6 +28,7 @@ class ChatService:
         self.max_context_messages = max_context_messages
         self.party_planner = PartyPlanner()
         self.active_plans = {}  # conversation_id -> PartyPlan
+        self.conversation_locks = {}  # conversation_id -> asyncio.Lock
         self.system_prompt = """Jesteś pomocnym asystentem AI dla systemu umawiania wizyt i połączeń telefonicznych.
 Możesz pomóc użytkownikom w:
 - Umawianiu wizyt
@@ -81,6 +83,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         Process a user message and generate AI response.
         
         Handles both normal chat and party planning flow.
+        Uses a lock to prevent concurrent processing of the same conversation.
         
         Args:
             conversation_id: ID of the conversation
@@ -89,66 +92,77 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         Returns:
             Tuple of (user_message, assistant_message)
         """
-        try:
-            # Load conversation to get history
-            conversation = storage_manager.load_conversation(conversation_id)
-            if not conversation:
-                raise ValueError(f"Conversation {conversation_id} not found")
-            
-            # Create user message
-            user_message = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.USER,
-                content=content,
-                timestamp=datetime.now(),
-                metadata={}
-            )
-            
-            # Check if there's an active party plan for this conversation
-            plan = storage_manager.get_plan_by_conversation(conversation_id)
-            
-            if plan and plan.state != PlanState.COMPLETE:
-                # Active party plan exists - route to party planner
-                logger.info(f"Routing to party planner (state: {plan.state})")
-                ai_content = await self._process_party_planning(
-                    conversation_id,
-                    content,
-                    plan
+        # Get or create lock for this conversation
+        if conversation_id not in self.conversation_locks:
+            self.conversation_locks[conversation_id] = asyncio.Lock()
+        
+        lock = self.conversation_locks[conversation_id]
+        
+        # Acquire lock - only one request per conversation at a time
+        async with lock:
+            logger.info(f"🔒 Acquired lock for conversation {conversation_id}")
+            try:
+                # Load conversation to get history
+                conversation = storage_manager.load_conversation(conversation_id)
+                if not conversation:
+                    raise ValueError(f"Conversation {conversation_id} not found")
+                
+                # Create user message
+                user_message = Message(
+                    id=str(uuid.uuid4()),
+                    conversation_id=conversation_id,
+                    role=MessageRole.USER,
+                    content=content,
+                    timestamp=datetime.now(),
+                    metadata={}
                 )
-            elif self.party_planner.is_party_request(content):
-                # New party request detected
-                logger.info("New party request detected, starting party planner")
-                ai_content = await self._start_party_planning(
-                    conversation_id,
-                    content
+                
+                # Check if there's an active party plan for this conversation
+                plan = storage_manager.get_plan_by_conversation(conversation_id)
+                
+                if plan and plan.state != PlanState.COMPLETE:
+                    # Active party plan exists - route to party planner
+                    logger.info(f"Routing to party planner (state: {plan.state})")
+                    ai_content = await self._process_party_planning(
+                        conversation_id,
+                        content,
+                        plan
+                    )
+                elif self.party_planner.is_party_request(content):
+                    # New party request detected
+                    logger.info("New party request detected, starting party planner")
+                    ai_content = await self._start_party_planning(
+                        conversation_id,
+                        content
+                    )
+                else:
+                    # Normal chat flow
+                    logger.info("Normal chat flow")
+                    ai_content = await self.generate_ai_response(
+                        conversation.messages,
+                        content
+                    )
+                
+                # Create assistant message
+                assistant_message = Message(
+                    id=str(uuid.uuid4()),
+                    conversation_id=conversation_id,
+                    role=MessageRole.ASSISTANT,
+                    content=ai_content,
+                    timestamp=datetime.now(),
+                    metadata={
+                        "model": "gemini-2.5-flash"
+                    }
                 )
-            else:
-                # Normal chat flow
-                logger.info("Normal chat flow")
-                ai_content = await self.generate_ai_response(
-                    conversation.messages,
-                    content
-                )
-            
-            # Create assistant message
-            assistant_message = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.ASSISTANT,
-                content=ai_content,
-                timestamp=datetime.now(),
-                metadata={
-                    "model": "gemini-2.5-flash"
-                }
-            )
-            
-            logger.info(f"Processed message for conversation {conversation_id}")
-            return user_message, assistant_message
-            
-        except Exception as e:
-            logger.error(f"Failed to process message: {e}")
-            raise
+                
+                logger.info(f"Processed message for conversation {conversation_id}")
+                return user_message, assistant_message
+                
+            except Exception as e:
+                logger.error(f"Failed to process message: {e}")
+                raise
+            finally:
+                logger.info(f"🔓 Released lock for conversation {conversation_id}")
     
     async def _start_party_planning(
         self,
@@ -216,9 +230,75 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         self.party_planner.user_request = plan.user_request
         self.party_planner.feedback_history = plan.feedback_history
         self.party_planner.gathered_info = plan.gathered_info
+        # Ensure conversation_id is in gathered_info for task storage
+        self.party_planner.gathered_info["conversation_id"] = conversation_id
+        
+        # Store the state BEFORE processing
+        state_before = self.party_planner.state
         
         # Process user input
         response = await self.party_planner.process_request(user_input)
+        
+        # Check if we JUST TRANSITIONED to SEARCHING (gathering just completed)
+        # Frontend will auto-refresh to see new messages as they appear
+        if state_before == PlanState.GATHERING and self.party_planner.state == PlanState.SEARCHING:
+            logger.info("🔍 Gathering complete, executing search flow step by step...")
+            
+            # Step 1: Venue search
+            logger.info("🏢 Step 1: Searching venues...")
+            venue_response = await self.party_planner.search_venues_only()
+            venue_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=venue_response,
+                timestamp=datetime.now(),
+                metadata={"step": "venue_search"}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, venue_msg)
+            logger.info("✅ Venue search message saved (frontend can now see it)")
+            
+            # Step 2: Bakery search
+            logger.info("🍰 Step 2: Searching bakeries...")
+            bakery_response = await self.party_planner.search_bakeries_only()
+            bakery_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=bakery_response,
+                timestamp=datetime.now(),
+                metadata={"step": "bakery_search"}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, bakery_msg)
+            logger.info("✅ Bakery search message saved (frontend can now see it)")
+            
+            # Step 3: Task generation
+            logger.info("📋 Step 3: Generating tasks...")
+            task_response = await self.party_planner.generate_and_save_tasks()
+            task_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=task_response,
+                timestamp=datetime.now(),
+                metadata={"step": "task_generation"}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, task_msg)
+            logger.info("✅ Task generation message saved")
+            logger.info("🎉 All 3 messages saved! Frontend auto-refresh will show them.")
+            
+            # ⭐ Check if we transitioned to EXECUTING (party_planner changed state)
+            if self.party_planner.state == PlanState.EXECUTING:
+                logger.info("📞 Starting voice agent execution...")
+                plan_id = self.party_planner.gathered_info.get("plan_id")
+                
+                if plan_id:
+                    await self.execute_voice_agent_tasks(conversation_id, plan_id)
+                    
+                    # After execution, mark as complete
+                    self.party_planner.state = PlanState.COMPLETE
+                else:
+                    logger.error("No plan_id found in gathered_info!")
         
         # Update plan
         plan.current_plan = self.party_planner.current_plan
@@ -231,6 +311,240 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         logger.info(f"Updated plan {plan.id}, new state: {plan.state}")
         
         return response
+    
+    async def execute_voice_agent_tasks(
+        self,
+        conversation_id: str,
+        plan_id: str
+    ) -> None:
+        """
+        Wykonuje tasks przez voice agent z real-time komunikacją do użytkownika
+        
+        Args:
+            conversation_id: ID konwersacji
+            plan_id: ID planu (do pobrania tasks z storage)
+        """
+        from voice_agent import initiate_call, wait_for_conversation_completion, format_transcript, analyze_call_with_llm
+        import time
+        
+        # Pobierz tasks z storage
+        tasks = storage_manager.load_task_list(plan_id)
+        if not tasks:
+            logger.error(f"No tasks found for plan_id: {plan_id}")
+            return
+        
+        logger.info(f"🎯 Executing {len(tasks)} tasks...")
+        
+        for task_idx, task in enumerate(tasks):
+            # Task already loaded from storage (Task object)
+            
+            logger.info(f"📋 Task {task_idx + 1}/{len(tasks)}: {task.task_id}")
+            
+            # Send initial message about this task
+            task_type = "lokal/restaurację" if "restaurant" in task.task_id else "cukiernię"
+            intro_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=f"📞 Zaczynam dzwonić do {task_type}...\n\nMam {len(task.places)} opcji do wypróbowania.",
+                timestamp=datetime.now(),
+                metadata={"task_id": task.task_id, "step": "task_start"}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, intro_msg)
+            
+            # Try each place until success
+            for place_idx, place in enumerate(task.places):
+                logger.info(f"📞 Calling place {place_idx + 1}/{len(task.places)}: {place.name}")
+                
+                # OVERRIDE phone number for POC
+                original_phone = place.phone
+                place.phone = "+48886859039"  # HARDCODED FOR POC
+                
+                # 1. Send "Calling..." message
+                calling_msg_content = f"""📞 Dzwonię do: **{place.name}**
+📱 Numer: {place.phone}
+
+📝 **Instrukcje dla agenta:**
+{task.notes_for_agent}
+
+⏳ Czekam na połączenie..."""
+                
+                calling_msg = Message(
+                    id=str(uuid.uuid4()),
+                    conversation_id=conversation_id,
+                    role=MessageRole.ASSISTANT,
+                    content=calling_msg_content,
+                    timestamp=datetime.now(),
+                    metadata={
+                        "task_id": task.task_id,
+                        "place_name": place.name,
+                        "place_phone": place.phone,
+                        "step": "calling"
+                    }
+                )
+                storage_manager.add_message_to_conversation(conversation_id, calling_msg)
+                
+                # 2. Initiate call
+                call_result = initiate_call(task, place)
+                
+                if not call_result or not call_result.get('conversation_id'):
+                    # Call failed to initiate
+                    error_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"❌ Nie udało się nawiązać połączenia z {place.name}.\n\nPróbuję kolejne miejsce...",
+                        timestamp=datetime.now(),
+                        metadata={"step": "call_failed"}
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, error_msg)
+                    place.phone = original_phone  # Restore
+                    continue  # Try next place
+                
+                eleven_conversation_id = call_result['conversation_id']
+                
+                # 3. Wait for completion
+                conversation_data = wait_for_conversation_completion(eleven_conversation_id)
+                
+                if not conversation_data:
+                    # Failed to get conversation data
+                    error_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"❌ Nie udało się pobrać transkryptu rozmowy z {place.name}.\n\nPróbuję kolejne miejsce...",
+                        timestamp=datetime.now(),
+                        metadata={"step": "transcript_failed"}
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, error_msg)
+                    place.phone = original_phone  # Restore
+                    continue  # Try next place
+                
+                # 4. Format and display transcript
+                try:
+                    # Debug: Show structure if transcript might be problematic
+                    from voice_agent import debug_conversation_structure
+                    if not conversation_data.get('transcript'):
+                        logger.warning(f"⚠️  No 'transcript' key in conversation data for {place.name}")
+                        debug_conversation_structure(conversation_data)
+                    
+                    transcript = format_transcript(conversation_data)
+                    
+                    # Check if transcript parsing failed
+                    if "Failed to parse transcript" in transcript or "Transcript is empty" in transcript:
+                        logger.warning(f"⚠️  Transcript parsing issue for {place.name}")
+                        debug_conversation_structure(conversation_data)
+                    
+                    transcript_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"📞 **Zakończono rozmowę z {place.name}**\n\n{transcript}",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "task_id": task.task_id,
+                            "place_name": place.name,
+                            "step": "transcript",
+                            "conversation_id": eleven_conversation_id
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, transcript_msg)
+                    
+                except Exception as e:
+                    logger.error(f"❌ Error formatting transcript: {e}")
+                    error_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"❌ Błąd podczas formatowania transkryptu z {place.name}.\n\nStatus rozmowy: {conversation_data.get('status', 'unknown')}\nSprawdź logi backendu dla szczegółów.",
+                        timestamp=datetime.now(),
+                        metadata={"step": "transcript_format_error"}
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, error_msg)
+                    place.phone = original_phone  # Restore
+                    continue  # Try next place
+                
+                # 5. Analyze with LLM
+                analysis = analyze_call_with_llm(task, place, transcript)
+                
+                # 6. Send analysis result
+                if analysis['success'] and not analysis['should_continue']:
+                    # SUCCESS - goal achieved!
+                    success_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"""✅ **Sukces w {place.name}!**
+
+📊 Analiza rozmowy:
+- Status: Cel osiągnięty ✅
+- Powód: {analysis['reason']}
+- Pewność: {analysis.get('confidence', 0) * 100:.0f}%
+
+🎉 Przechodzę do następnego zadania...""",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "task_id": task.task_id,
+                            "step": "analysis",
+                            "analysis": analysis
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, success_msg)
+                    
+                    # Restore original phone
+                    place.phone = original_phone
+                    
+                    # BREAK - move to next task
+                    break
+                else:
+                    # FAILED or UNCLEAR - try next place
+                    retry_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=f"""⚠️ **Rozmowa z {place.name} nieudana**
+
+📊 Analiza rozmowy:
+- Status: Cel nieosiągnięty
+- Powód: {analysis['reason']}
+- Decyzja: Próbuję kolejne miejsce
+
+⏭️ Przechodzę do następnej opcji...""",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "task_id": task.task_id,
+                            "step": "analysis_retry",
+                            "analysis": analysis
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, retry_msg)
+                    
+                    # Restore original phone
+                    place.phone = original_phone
+                    
+                    # Short pause before next call
+                    if place_idx < len(task.places) - 1:
+                        time.sleep(5)
+                    
+                    # CONTINUE - try next place
+                    continue
+        
+        # All tasks completed
+        final_msg = Message(
+            id=str(uuid.uuid4()),
+            conversation_id=conversation_id,
+            role=MessageRole.ASSISTANT,
+            content=f"""🎉 **Zakończono wszystkie zadania!**
+
+📞 Wykonano połączenia dla {len(tasks)} zadań.
+
+Sprawdź transkrypty powyżej aby zobaczyć szczegóły każdej rozmowy.""",
+            timestamp=datetime.now(),
+            metadata={"step": "execution_complete"}
+        )
+        storage_manager.add_message_to_conversation(conversation_id, final_msg)
+        
+        logger.info("✅ All tasks executed!")
     
     async def generate_ai_response(
         self, 
