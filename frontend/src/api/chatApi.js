@@ -1,4 +1,4 @@
-import api from './axios';
+import api from "./axios";
 
 /**
  * API client for chat functionality
@@ -9,7 +9,7 @@ import api from './axios';
  * @returns {Promise<Object>} Created conversation
  */
 export const createConversation = async () => {
-  const response = await api.post('/chat/conversations/', {});
+  const response = await api.post("/chat/conversations/", {});
   return response.data;
 };
 
@@ -18,7 +18,7 @@ export const createConversation = async () => {
  * @returns {Promise<Array>} List of conversation metadata
  */
 export const getConversations = async () => {
-  const response = await api.get('/chat/conversations/');
+  const response = await api.get("/chat/conversations/");
   return response.data;
 };
 
@@ -71,6 +71,23 @@ export const getMessages = async (conversationId, limit = 50, offset = 0) => {
   return response.data;
 };
 
+/**
+ * Transcribe audio to text
+ * @param {Blob} audioBlob - The audio data to transcribe
+ * @returns {Promise<Object>} The transcription result
+ */
+export const transcribeAudio = async (audioBlob) => {
+  const formData = new FormData();
+  formData.append("file", audioBlob, "recording.webm");
+  console.log(formData);
+  const response = await api.post("/voice/transcribe", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
 export default {
   createConversation,
   getConversations,
@@ -78,5 +95,5 @@ export default {
   sendMessage,
   deleteConversation,
   getMessages,
+  transcribeAudio,
 };
-

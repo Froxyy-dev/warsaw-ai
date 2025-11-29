@@ -127,9 +127,189 @@
       "metadata": {
         "model": "gemini-2.5-flash"
       }
+    },
+    {
+      "id": "61b8701e-aabe-478b-b5ea-35a0e6060fdb",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Nie, to spoko. dużo, tak? Możemy robić wszystko. na",
+      "timestamp": "2025-11-29T17:33:57.541160",
+      "metadata": {}
+    },
+    {
+      "id": "52b68110-5203-497e-ac0f-1f82bc7ae384",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Nie, to spoko. Rozumiem, że wszystko jest w porządku i możemy działać.",
+      "timestamp": "2025-11-29T17:34:01.047664",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "c1875e84-0f9d-404c-8506-9eba28caab90",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Szczbrzeszynie, chrząszcz brzmi w trzcinie.",
+      "timestamp": "2025-11-29T17:35:44.908115",
+      "metadata": {}
+    },
+    {
+      "id": "31fea31e-aa83-4b74-848a-80bf39402e30",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, to jest znany polski łamaniec językowy! \"W Szczebrzeszynie chrząszcz brzmi w trzcinie i Szczebrzeszyn z tego słynie\".\n\nWracając do naszej organizacji imprezy: Czy masz już numer telefonu do Restauracji Smak, abym mógł Ci go podać, czy wolisz, żebym spróbował go dla Ciebie wyszukać, żebyśmy mogli dokonać rezerwacji?",
+      "timestamp": "2025-11-29T17:35:55.190636",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "7c3b9162-05df-4b71-a3d2-c6be922e3f90",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Jeszcze przy sinie. Krzaczek przy mnie przy sinie.",
+      "timestamp": "2025-11-29T17:38:05.884422",
+      "metadata": {}
+    },
+    {
+      "id": "a2172da1-79b2-4857-b1c5-849c85666acc",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, dziękuję za podzielenie się tymi frazami!\n\nWracając do naszej imprezy urodzinowej: Czy masz już numer telefonu do Restauracji Smak w Szczebrzeszynie, abym mógł go zanotować, czy wolisz, żebym spróbował go dla Ciebie wyszukać, abyśmy mogli dokonać rezerwacji na 1 grudnia o 17:00?",
+      "timestamp": "2025-11-29T17:38:09.749625",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "33bb7951-5fd1-4ec9-8c20-52db4263c19d",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "[ 0m0s110ms - 0m5s610ms ] Okay.",
+      "timestamp": "2025-11-29T17:43:26.736758",
+      "metadata": {}
+    },
+    {
+      "id": "4cdbec60-daee-4668-981b-7246d5a08838",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Dobrze.\n\nCzy w takim razie mogę spróbować wyszukać numer telefonu do Restauracji Smak w Szczebrzeszynie, abyśmy mogli dokonać rezerwacji?",
+      "timestamp": "2025-11-29T17:43:30.373353",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "de81e38d-0980-4d48-922d-9d91bc6ae169",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "szyszczymy sobie nowe tak, nowy. Teraz mamy sobie, że ja.",
+      "timestamp": "2025-11-29T17:48:29.681757",
+      "metadata": {}
+    },
+    {
+      "id": "33e37770-3789-43f5-8b70-2d7dbe51b6e9",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. Wygląda na to, że zmieniliśmy temat lub pojawiła się jakaś nowa kwestia.\n\nWracając do naszej rezerwacji: Czy chcesz, abym kontynuował poszukiwania restauracji w Szczebrzeszynie, czy może masz inną nazwę lub pomysł na miejsce, gdzie moglibyśmy zorganizować imprezę?",
+      "timestamp": "2025-11-29T17:48:34.934408",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "50c6432e-db70-4c0b-9dc8-5d5a4456d03f",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "transcribe this audio\nHum",
+      "timestamp": "2025-11-29T17:49:11.595664",
+      "metadata": {}
+    },
+    {
+      "id": "8a018ccf-8b4f-46f8-9f28-be905efc4682",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hum",
+      "timestamp": "2025-11-29T17:49:15.057937",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0936bf47-845c-49aa-a7fe-48981fb5b2e0",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:51:04.416267",
+      "metadata": {}
+    },
+    {
+      "id": "af5785da-4999-4f43-aa03-c205c0b2cc39",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello! How can I assist you today? I'm an AI assistant for appointment scheduling and phone calls. I can help you with:\n- Scheduling appointments\n- Checking call status\n- Managing your calendar\n- Answering questions about the system",
+      "timestamp": "2025-11-29T17:51:06.186875",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0f28e318-f3a6-490b-addf-0c9bfbb5be30",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:52:50.192585",
+      "metadata": {}
+    },
+    {
+      "id": "167dc4eb-d7a7-48b4-8a63-1fd7944e4250",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello! How can I assist you today? I'm here to help with scheduling appointments, checking call status, managing your calendar, or answering any questions about the system.",
+      "timestamp": "2025-11-29T17:52:53.227595",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "f8eb32c7-b138-44d9-8d00-035ce1e98dd8",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:55:26.615042",
+      "metadata": {}
+    },
+    {
+      "id": "dd8ca72d-5581-42b8-972e-999e3746d941",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello again! How can I help you today? Please let me know if you need assistance with scheduling an appointment, checking on a call, managing your calendar, or if you have any questions about our system.",
+      "timestamp": "2025-11-29T17:55:29.894828",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "f71dedef-8068-4554-91f8-071f54b7223d",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "결국은",
+      "timestamp": "2025-11-29T17:58:08.955704",
+      "metadata": {}
+    },
+    {
+      "id": "f0ce9a21-86d5-4bf8-aa94-8667b2efdcd1",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. \"결국은\" oznacza \"w końcu\" lub \"ostatecznie\".\n\nCzy to nawiązuje do naszej poprzedniej rozmowy o rezerwacji, czy masz może jakieś nowe pytanie lub potrzebujesz pomocy z jedną z moich funkcji, takich jak umawianie wizyt, sprawdzanie statusu połączeń, zarządzanie kalendarzem lub pytania o system?",
+      "timestamp": "2025-11-29T17:58:11.807926",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
     }
   ],
   "created_at": "2025-11-29T16:33:55.582913",
-  "updated_at": "2025-11-29T16:35:24.971420",
+  "updated_at": "2025-11-29T17:58:11.810588",
   "status": "active"
 }
