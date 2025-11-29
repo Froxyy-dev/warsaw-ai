@@ -1,0 +1,79 @@
+.App {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.App-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+}
+
+.App-header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.App-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  background: #f5f5f5;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 20px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #666;
+}
+
+.tabs button:hover {
+  background: #e8e8e8;
+}
+
+.tabs button.active {
+  background: white;
+  color: #667eea;
+  border-bottom: 3px solid #667eea;
+}
+
+.tab-content {
+  padding: 30px;
+  min-height: 500px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2rem;
+  }
+  
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab-content {
+    padding: 20px;
+  }
+}
+
