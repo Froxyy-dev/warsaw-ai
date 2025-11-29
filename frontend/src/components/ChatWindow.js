@@ -41,26 +41,24 @@ function ChatWindow() {
     scrollToBottom();
   }, [messages]);
 
-  // Auto-refresh conversation when searching
+  // Auto-refresh conversation when backend is processing
   useEffect(() => {
     if (isSearching && conversationId) {
-      console.log('🔄 Starting auto-refresh (searching venues/bakeries)...');
+      console.log('🔄 Starting auto-refresh - backend is processing...');
       
       autoRefreshInterval.current = setInterval(async () => {
         try {
           console.log('🔄 Auto-refreshing conversation...');
           const conv = await getConversation(conversationId);
-          setMessages(conv.messages);
+          console.log('   Fetched conversation with', conv.messages.length, 'messages');
+          console.log('   Current state has', messages.length, 'messages');
           
-          // Check if we're still searching by looking at last message
-          const lastMsg = conv.messages[conv.messages.length - 1];
-          if (lastMsg && (
-              lastMsg.content.includes('🎉 Wszystko gotowe') ||
-              lastMsg.content.includes('🎉 Zakończono wszystkie zadania')
-          )) {
-            console.log('✅ Process complete, stopping auto-refresh');
-            setIsSearching(false);
+          if (conv.messages.length !== messages.length) {
+            console.log('   ✅ NEW MESSAGES DETECTED! Updating...');
           }
+          
+          // Force update by creating new array reference
+          setMessages([...conv.messages]);
         } catch (err) {
           console.error('Auto-refresh failed:', err);
         }
@@ -117,13 +115,14 @@ function ChatWindow() {
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    setIsSearching(true);  // ⭐ Enable auto-refresh immediately
 
     try {
       // Ensure conversation exists
       const convId = await ensureConversation();
       console.log('Conversation ID:', convId);
       
-      // Send message to backend
+      // Send message to backend (may take several minutes)
       console.log('Sending message:', messageContent);
       const response = await sendMessageApi(convId, messageContent);
       console.log('Got response:', response);
@@ -133,16 +132,6 @@ function ChatWindow() {
       const updatedConv = await getConversation(convId);
       console.log('Updated conversation:', updatedConv);
       setMessages(updatedConv.messages || []);
-
-      // Check if backend is processing - if so, start auto-refresh
-      const lastMessage = updatedConv.messages[updatedConv.messages.length - 1];
-      if (lastMessage && (
-          lastMessage.content.includes('🔍 Zaczynam wyszukiwanie') ||
-          lastMessage.content.includes('📞 Rozpoczynam wykonywanie')
-      )) {
-        console.log('🔍 Detected active processing, enabling auto-refresh');
-        setIsSearching(true);
-      }
 
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -154,6 +143,7 @@ function ChatWindow() {
       setInputValue(messageContent);
     } finally {
       setIsLoading(false);
+      setIsSearching(false);  // ⭐ Disable auto-refresh when done
     }
   };
 

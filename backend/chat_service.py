@@ -489,16 +489,28 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 # 6. Send analysis result
                 if analysis['success'] and not analysis['should_continue']:
                     # SUCCESS - goal achieved!
+                    details_text = ""
+                    appointment_details = analysis.get('appointment_details', {})
+                    if appointment_details and any(appointment_details.values()):
+                        details_text = "\n\n📋 **Szczegóły rezerwacji:**"
+                        if appointment_details.get('date'):
+                            details_text += f"\n- Data: {appointment_details['date']}"
+                        if appointment_details.get('time'):
+                            details_text += f"\n- Godzina: {appointment_details['time']}"
+                        if appointment_details.get('service'):
+                            details_text += f"\n- Usługa: {appointment_details['service']}"
+                        if appointment_details.get('price'):
+                            details_text += f"\n- Cena: {appointment_details['price']}"
+                        if appointment_details.get('additional_info'):
+                            details_text += f"\n- Dodatkowe info: {appointment_details['additional_info']}"
+                    
                     success_msg = Message(
                         id=str(uuid.uuid4()),
                         conversation_id=conversation_id,
                         role=MessageRole.ASSISTANT,
                         content=f"""✅ **Sukces w {place.name}!**
 
-📊 Analiza rozmowy:
-- Status: Cel osiągnięty ✅
-- Powód: {analysis['reason']}
-- Pewność: {analysis.get('confidence', 0) * 100:.0f}%
+💬 **Co się stało:** {analysis['reason']}{details_text}
 
 🎉 Przechodzę do następnego zadania...""",
                         timestamp=datetime.now(),
@@ -517,18 +529,18 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     break
                 else:
                     # FAILED or UNCLEAR - try next place
+                    has_more_places = place_idx < len(task.places) - 1
+                    next_action = "Próbuję kolejne miejsce..." if has_more_places else "To była ostatnia opcja w tej kategorii."
+                    
                     retry_msg = Message(
                         id=str(uuid.uuid4()),
                         conversation_id=conversation_id,
                         role=MessageRole.ASSISTANT,
-                        content=f"""⚠️ **Rozmowa z {place.name} nieudana**
+                        content=f"""⚠️ **Nie udało się w {place.name}**
 
-📊 Analiza rozmowy:
-- Status: Cel nieosiągnięty
-- Powód: {analysis['reason']}
-- Decyzja: Próbuję kolejne miejsce
+💬 **Co się stało:** {analysis['reason']}
 
-⏭️ Przechodzę do następnej opcji...""",
+⏭️ {next_action}""",
                         timestamp=datetime.now(),
                         metadata={
                             "task_id": task.task_id,
@@ -548,22 +560,31 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     # CONTINUE - try next place
                     continue
         
-        # All tasks completed
+        # All tasks completed - summarize results
+        total_calls = sum(len(task.places) for task in tasks)
+        
+        # Count successful tasks (at least one successful place per task)
+        # We can infer this from the logs but for now just show totals
+        
         final_msg = Message(
             id=str(uuid.uuid4()),
             conversation_id=conversation_id,
             role=MessageRole.ASSISTANT,
             content=f"""🎉 **Zakończono wszystkie zadania!**
 
-📞 Wykonano połączenia dla {len(tasks)} zadań.
+📊 **Podsumowanie:**
+- Zadań do wykonania: {len(tasks)}
+- Miejsc sprawdzonych: sprawdź transkrypty powyżej
 
-Sprawdź transkrypty powyżej aby zobaczyć szczegóły każdej rozmowy.""",
+💬 Wszystkie rozmowy z transkryptami i analizami znajdują się powyżej.
+
+Czy mogę Ci w czymś jeszcze pomóc?""",
             timestamp=datetime.now(),
-            metadata={"step": "execution_complete"}
+            metadata={"step": "execution_complete", "total_tasks": len(tasks)}
         )
         storage_manager.add_message_to_conversation(conversation_id, final_msg)
         
-        logger.info("✅ All tasks executed!")
+        logger.info(f"✅ All {len(tasks)} tasks executed!")
     
     async def generate_ai_response(
         self, 

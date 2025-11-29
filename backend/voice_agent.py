@@ -75,7 +75,7 @@ def initiate_call(task: Task, place: Place) -> Optional[Dict[str, Any]]:
 
 def wait_for_conversation_completion(
     conversation_id: str, 
-    max_wait_seconds: int = 120,
+    max_wait_seconds: int = 240,
     check_interval: int = 3
 ) -> Optional[Dict[str, Any]]:
     """
@@ -346,29 +346,41 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
             print(f"... (total {len(response)} chars)")
         print(f"{'='*60}\n")
         
-        # Parse JSON response
+        # Parse JSON response - try code block first (LLM often wraps in markdown)
         import json
-        try:
-            llm_result = json.loads(response)
-        except json.JSONDecodeError as je:
-            print(f"❌ JSON parsing error: {je}")
-            print(f"   Response was not valid JSON")
-            print(f"   Trying to extract JSON from response...\n")
-            
-            # Try to extract JSON from markdown code blocks
-            import re
-            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
-            if json_match:
-                print(f"✅ Found JSON in code block, parsing...")
+        import re
+        
+        llm_result = None
+        
+        # Try 1: Extract from markdown code block (most common)
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
+        if json_match:
+            print(f"✅ Extracting JSON from markdown code block...")
+            try:
                 llm_result = json.loads(json_match.group(1))
-            else:
-                # Try to find raw JSON
-                json_match = re.search(r'(\{.*\})', response, re.DOTALL)
-                if json_match:
-                    print(f"✅ Found raw JSON, parsing...")
+            except json.JSONDecodeError as e:
+                print(f"⚠️  Failed to parse JSON from code block: {e}")
+        
+        # Try 2: Parse entire response as JSON (if not wrapped)
+        if not llm_result:
+            try:
+                llm_result = json.loads(response)
+                print(f"✅ Parsed response as raw JSON")
+            except json.JSONDecodeError:
+                pass
+        
+        # Try 3: Find any JSON object in response
+        if not llm_result:
+            json_match = re.search(r'(\{[^{]*"success"[^}]*\})', response, re.DOTALL)
+            if json_match:
+                print(f"✅ Extracting JSON object from text...")
+                try:
                     llm_result = json.loads(json_match.group(1))
-                else:
-                    raise ValueError("Could not find JSON in response")
+                except json.JSONDecodeError:
+                    pass
+        
+        if not llm_result:
+            raise ValueError("Could not extract valid JSON from LLM response")
         
         # 🔍 VERBOSE: Show parsed result
         print(f"✅ Analysis complete!")
@@ -391,16 +403,16 @@ def analyze_call_with_llm(task: Task, place: Place, transcript: str) -> Dict[str
             "llm_response": llm_result,
             "llm_raw_response": response  # Keep raw for debugging
         }
-    except json.JSONDecodeError as e:
-        print(f"❌ JSON parsing failed: {e}")
-        print(f"   Could not parse LLM response as JSON")
-        print(f"   Raw response: {response[:200]}...")
+    except ValueError as e:
+        print(f"❌ Failed to extract JSON: {e}")
+        print(f"   Raw response (first 300 chars): {response[:300]}...")
         llm_result = None
     except Exception as e:
         print(f"❌ LLM error: {e}")
         import traceback
         print(f"   Traceback:")
         traceback.print_exc()
+        print(f"   Raw response (first 300 chars): {response[:300] if 'response' in locals() else 'N/A'}...")
         llm_result = None
     
     if not llm_result:

@@ -1,0 +1,204 @@
+{
+  "id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+  "title": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj i...",
+  "messages": [
+    {
+      "id": "257de582-bca4-4e31-a6af-870243e9ebb5",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "user",
+      "content": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
+      "timestamp": "2025-11-29T19:30:42.937375",
+      "metadata": {}
+    },
+    {
+      "id": "7ec17d46-c064-4c10-8336-9ad90a9a687d",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "Oto plan dla Twojej imprezy:\n\nZadzwonić do lokalu z salami z następującymi instrukcjami:\n- Rezerwacja: 1 grudnia, godzina 16:00, 5 godzin\n- Liczba osób: 10\n- Dekoracje urodzinowe\n- Menu na imprezę\n- Tort urodzinowy\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-29T19:30:45.784831",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "852aa6e4-f472-4f63-b311-327181d35fd5",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "user",
+      "content": "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska.",
+      "timestamp": "2025-11-29T19:30:48.755260",
+      "metadata": {}
+    },
+    {
+      "id": "92f34efd-5aac-4a42-bfc7-62912855a2a4",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "Oto zaktualizowany plan:\n\nZadzwonić do lokalu z salami:\n*   Rezerwacja: 1 grudnia, 16:00, 5 godzin.\n*   Liczba osób: 10.\n*   Dekoracje urodzinowe.\n*   Menu: tradycyjna kuchnia polska.\n\nZamówić tort w cukierni:\n*   Tort urodzinowy.\n*   Napis: wszystkiego najlepszego Ada.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-29T19:30:52.721410",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0843f6de-57be-48ca-8196-948790bb3dc6",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "user",
+      "content": "Zatwierdzam",
+      "timestamp": "2025-11-29T19:30:58.701772",
+      "metadata": {}
+    },
+    {
+      "id": "42b7238c-2e26-4347-8514-0d08bfc986cd",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "✅ Plan zatwierdzony!\n\n📝 Teraz potrzebuję kilku danych do realizacji...\n\nJakie imię i nazwisko?\nJaki numer telefonu?",
+      "timestamp": "2025-11-29T19:31:00.116763",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "4fc8564b-560f-485c-8ddb-53dc4038c94a",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "🏢 Lokale w Warszawa:\n\n1. Restauracja AleGloria\n   📞 +48 22 584 70 80\n   🌐 www.alegloria.pl\n\n2. Restauracja Belvedere\n   📞 +48 606 102 002\n   🌐 www.belvedere.com.pl\n\n3. Flaming & Co.\n   📞 +48 724 234 234\n   🌐 www.flaming-co.com",
+      "timestamp": "2025-11-29T19:31:26.584839",
+      "metadata": {
+        "step": "venue_search"
+      }
+    },
+    {
+      "id": "ba99451d-c870-499c-8744-0ac61a39417e",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "🍰 Cukiernie w Warszawa:\n\n1. Cukiernia Sowa\n   📞 +48 516 054 724\n   🌐 www.cukierniasowa.pl\n\n2. Batida\n   📞 +48 662 214 314\n   🌐 www.batida.pl\n\n3. Miodowa Cukiernia, Kawiarnia\n   📞 +48 660 406 480\n   🌐 www.miodowa.com.pl",
+      "timestamp": "2025-11-29T19:31:42.558543",
+      "metadata": {
+        "step": "bakery_search"
+      }
+    },
+    {
+      "id": "7ca19aa9-1754-4bc9-b5bf-9715ec951b51",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "✅ Lista zadań gotowa! Przygotowano 2 zadań.\n📋 Szczegóły wyświetlone w konsoli backendu.\n\n📞 Rozpoczynam wykonywanie zadań...",
+      "timestamp": "2025-11-29T19:31:42.560450",
+      "metadata": {
+        "step": "task_generation"
+      }
+    },
+    {
+      "id": "9e6e721c-b08c-4bf9-a421-6f0ac2a4a9a3",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "📞 Zaczynam dzwonić do lokal/restaurację...\n\nMam 3 opcji do wypróbowania.",
+      "timestamp": "2025-11-29T19:31:42.569062",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "step": "task_start"
+      }
+    },
+    {
+      "id": "2f09dbc1-350c-4984-9992-e10c8306ba25",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "📞 Dzwonię do: **Restauracja AleGloria**\n📱 Numer: +48886859039\n\n📝 **Instrukcje dla agenta:**\nDzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.\n\n⏳ Czekam na połączenie...",
+      "timestamp": "2025-11-29T19:31:42.570529",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "place_name": "Restauracja AleGloria",
+        "place_phone": "+48886859039",
+        "step": "calling"
+      }
+    },
+    {
+      "id": "47e4089e-e9e6-44f7-866e-456a398550df",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "❌ Nie udało się pobrać transkryptu rozmowy z Restauracja AleGloria.\n\nPróbuję kolejne miejsce...",
+      "timestamp": "2025-11-29T19:33:46.094950",
+      "metadata": {
+        "step": "transcript_failed"
+      }
+    },
+    {
+      "id": "0b183ca8-541e-4de7-b802-8ad6c72a3509",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "📞 Dzwonię do: **Restauracja Belvedere**\n📱 Numer: +48886859039\n\n📝 **Instrukcje dla agenta:**\nDzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.\n\n⏳ Czekam na połączenie...",
+      "timestamp": "2025-11-29T19:33:46.096666",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "place_name": "Restauracja Belvedere",
+        "place_phone": "+48886859039",
+        "step": "calling"
+      }
+    },
+    {
+      "id": "0f358f4c-a5df-4cbf-889b-71c354a665c0",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "📞 **Zakończono rozmowę z Restauracja Belvedere**\n\n============================================================\nTRANSKRYPT ROZMOWY\n============================================================\n\n🤖 AGENT: Dzień dobry, czy dodzwoniłem się do Restauracja Belvedere?  \nZ tej strony Michał, asystent Mateusza z Call AI...\n\n============================================================",
+      "timestamp": "2025-11-29T19:34:04.691375",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "place_name": "Restauracja Belvedere",
+        "step": "transcript",
+        "conversation_id": "conv_7701kb8e8z1kfm6aan2wra8z1s7w"
+      }
+    },
+    {
+      "id": "c588a679-30a7-4d02-beb8-f26cd59a7fae",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "⚠️ **Nie udało się w Restauracja Belvedere**\n\n💬 **Co się stało:** Rozmowa nie zawiera żadnych informacji dotyczących szczegółów rezerwacji ani jej potwierdzenia. Transkrypt urywa się po przedstawieniu się agenta, co oznacza, że cel rozmowy nie został osiągnięty.\n\n⏭️ Próbuję kolejne miejsce...",
+      "timestamp": "2025-11-29T19:34:07.773726",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "step": "analysis_retry",
+        "analysis": {
+          "success": false,
+          "should_continue": true,
+          "reason": "Rozmowa nie zawiera żadnych informacji dotyczących szczegółów rezerwacji ani jej potwierdzenia. Transkrypt urywa się po przedstawieniu się agenta, co oznacza, że cel rozmowy nie został osiągnięty.",
+          "confidence": 1.0,
+          "appointment_details": {
+            "date": null,
+            "time": null,
+            "service": null,
+            "price": null,
+            "additional_info": null
+          },
+          "llm_response": {
+            "success": false,
+            "should_continue": true,
+            "reason": "Rozmowa nie zawiera żadnych informacji dotyczących szczegółów rezerwacji ani jej potwierdzenia. Transkrypt urywa się po przedstawieniu się agenta, co oznacza, że cel rozmowy nie został osiągnięty.",
+            "confidence": 1.0,
+            "appointment_details": {
+              "date": null,
+              "time": null,
+              "service": null,
+              "price": null,
+              "additional_info": null
+            }
+          },
+          "llm_raw_response": "```json\n{\n    \"success\": false,\n    \"should_continue\": true,\n    \"reason\": \"Rozmowa nie zawiera żadnych informacji dotyczących szczegółów rezerwacji ani jej potwierdzenia. Transkrypt urywa się po przedstawieniu się agenta, co oznacza, że cel rozmowy nie został osiągnięty.\",\n    \"confidence\": 1.0,\n    \"appointment_details\": {\n        \"date\": null,\n        \"time\": null,\n        \"service\": null,\n        \"price\": null,\n        \"additional_info\": null\n    }\n}\n```"
+        }
+      }
+    },
+    {
+      "id": "1da9c6e4-17d6-4ee9-9e3e-97cfeb65546f",
+      "conversation_id": "5edec6b2-59b4-4171-b058-ef377d08310d",
+      "role": "assistant",
+      "content": "📞 Dzwonię do: **Flaming & Co.**\n📱 Numer: +48886859039\n\n📝 **Instrukcje dla agenta:**\nDzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2025-12-01\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.\n\n⏳ Czekam na połączenie...",
+      "timestamp": "2025-11-29T19:34:12.783627",
+      "metadata": {
+        "task_id": "party-restaurant-e9bf7522",
+        "place_name": "Flaming & Co.",
+        "place_phone": "+48886859039",
+        "step": "calling"
+      }
+    }
+  ],
+  "created_at": "2025-11-29T19:30:42.918244",
+  "updated_at": "2025-11-29T19:34:12.784102",
+  "status": "active"
+}

@@ -52,7 +52,7 @@ def main():
     print("📞 KROK 2: Czekam na zakończenie rozmowy...")
     print("   (Maksymalnie 120 sekund)\n")
     
-    conversation_data = wait_for_conversation_completion(conversation_id, max_wait_seconds=120)
+    conversation_data = wait_for_conversation_completion(conversation_id, max_wait_seconds=240)
     
     if not conversation_data:
         print("❌ BŁĄD: Nie udało się pobrać danych rozmowy")
