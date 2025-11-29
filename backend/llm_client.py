@@ -1,137 +1,83 @@
-"""
-LLM Client - Pure interface for LLM interactions
-This module will be provided/maintained separately
-"""
 import os
-import json
-from typing import Dict, Any, Optional, List
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+# Load environment variables once when the module is imported
+load_dotenv()
+import os
+from typing import Generator, List
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 load_dotenv()
 
-# Configuration
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-
-def call_llm(
-    prompt: str, 
-    system_message: str = "You are a helpful assistant.",
-    model: str = "gpt-4o-mini",
-    response_format: str = "json",
-    temperature: float = 0.1
-) -> Optional[Dict[str, Any]]:
-    """
-    Generic LLM call interface.
-    
-    Args:
-        prompt: User prompt
-        system_message: System message
-        model: Model to use
-        response_format: "json" or "text"
-        temperature: 0.0-2.0
+class LLMClient:
+    def __init__(self, model: str = "gemini-2.0-flash-exp"):
+        """
+        Initialize the Gemini Client with a chat session.
         
-    Returns:
-        Dict with response or None if error
-    """
-    
-    if LLM_PROVIDER == "openai":
-        return _call_openai(prompt, system_message, model, response_format, temperature)
-    elif LLM_PROVIDER == "anthropic":
-        return _call_anthropic(prompt, system_message, model, response_format, temperature)
-    else:
-        print(f"⚠️  Unknown LLM provider: {LLM_PROVIDER}")
-        return None
+        Args:
+            model: The model to use. 
+                   (Note: 'gemini-2.5-flash' in your snippet may be a future/private 
+                   version. I've defaulted to '2.0-flash-exp' for public compatibility,
+                   but you can pass 'gemini-2.5-flash' if you have access).
+        """
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not found in environment variables.")
+            
+        self.client = genai.Client(api_key=api_key)
+        self.model = model
 
+        grounding_tool = types.Tool(
+            google_search=types.GoogleSearch()
+        )
 
-def _call_openai(
-    prompt: str,
-    system_message: str,
-    model: str,
-    response_format: str,
-    temperature: float
-) -> Optional[Dict[str, Any]]:
-    """
-    OpenAI API implementation.
-    """
-    if not OPENAI_API_KEY:
-        print("⚠️  OPENAI_API_KEY not set")
-        return None
-    
-    try:
-        from openai import OpenAI
-        
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        
-        kwargs = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": temperature,
-        }
-        
-        if response_format == "json":
-            kwargs["response_format"] = {"type": "json_object"}
-        
-        response = client.chat.completions.create(**kwargs)
-        
-        content = response.choices[0].message.content
-        
-        if response_format == "json":
-            result = json.loads(content)
-        else:
-            result = {"text": content}
-        
-        result["_meta"] = {
-            "model": model,
-            "tokens": response.usage.total_tokens,
-            "provider": "openai"
-        }
-        
-        return result
-        
-    except ImportError:
-        print("⚠️  OpenAI library not installed. Run: pip install openai")
-        return None
-    except Exception as e:
-        print(f"❌ Error calling OpenAI: {e}")
-        return None
+        self.config = types.GenerateContentConfig(
+            tools=[grounding_tool]
+        )
 
+        
+        # Initialize the chat session immediately
+        self.chat_session = self.client.chats.create(model=self.model, config=self.config)
+    def send_message(self, message: str) -> Generator[str, None, None]:
+        """
+        Sends a message to the active chat session and streams the response.
+        
+        Yields:
+            String chunks of the generated response.
+        """
+        try:
+            response_stream = self.chat_session.send_message_stream(message)
+            
+            for chunk in response_stream:
+                if chunk.text:
+                    yield chunk.text
+                    
+        except Exception as e:
+            yield f"\n[Error: {str(e)}]"
 
-def _call_anthropic(
-    prompt: str,
-    system_message: str,
-    model: str,
-    response_format: str,
-    temperature: float
-) -> Optional[Dict[str, Any]]:
-    """
-    Anthropic Claude API implementation.
-    """
-    # TODO: Implementation
-    print("⚠️  Anthropic not implemented yet")
-    return None
+    def get_history(self):
+        """
+        Retrieves the conversation history.
+        """
+        return self.chat_session.get_history()
 
+    def clear_chat(self):
+        """
+        Resets the conversation history by creating a new chat session.
+        """
+        self.chat_session = self.client.chats.create(model=self.model)
 
-# Convenience function for backwards compatibility
-def analyze_transcript_with_llm(prompt: str, model: str = "gpt-4o-mini") -> Optional[Dict[str, Any]]:
-    """
-    Convenience wrapper for transcript analysis.
-    """
-    system_msg = "Jesteś ekspertem od analizy rozmów telefonicznych. Zawsze odpowiadasz w formacie JSON zgodnym z instrukcjami."
-    return call_llm(prompt, system_msg, model, response_format="json")
-
-
-# Test
 if __name__ == "__main__":
-    test_prompt = "Analyze this: User says hello. Return JSON with sentiment."
-    result = call_llm(test_prompt)
-    
-    if result:
-        print("✅ LLM Client working!")
-        print(json.dumps(result, indent=2))
-    else:
-        print("❌ LLM Client not configured")
-
+    llm_client = LLMClient(model="gemini-2.5-flash")
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in {"exit", "quit"}:
+            break
+        response_generator = llm_client.send_message(user_input)
+        for chunk in response_generator:
+            print(chunk, end='', flush=True)
+        print()
