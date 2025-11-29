@@ -345,6 +345,21 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 plan_id = self.party_planner.gathered_info.get("plan_id")
                 
                 if plan_id:
+                    # ✅ Tell frontend to keep auto-refreshing - voice calls starting!
+                    voice_starting_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content="🎙️ **Zaczynam wykonywać połączenia głosowe...**\n\nAgent głosowy dzwoni do wybranych miejsc. Sprawdzaj aktualizacje poniżej!",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "step": "voice_agent_starting",
+                            "should_continue_refresh": True  # ✅ KEEP REFRESHING!
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, voice_starting_msg)
+                    logger.info("✅ Voice starting message saved with should_continue_refresh=True")
+                    
                     # ✅ RUN IN BACKGROUND - don't await! Return immediately!
                     import asyncio
                     asyncio.create_task(self._execute_voice_agent_in_background(conversation_id, plan_id))
