@@ -167,7 +167,7 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
         return any(mod in content_lower for mod in modifications)
     
     async def generate_plan(self, user_request: str) -> str:
-        """Generate initial party plan based on user request"""
+        """Generate initial party plan based on user request (ASYNC)"""
         logger.info(f"Generating plan for: {user_request}")
         
         try:
@@ -175,14 +175,15 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             prompt = self.plan_generation_prompt.format(user_request=user_request)
             llm_client = LLMClient(model=self.model)
             
-            # Generate plan
-            response = llm_client.send(prompt)
+            # ✅ ASYNC call - won't block!
+            logger.info("🔄 Calling LLM to generate plan...")
+            response = await llm_client.send_async(prompt)
+            logger.info("✅ Plan generated successfully")
             
-            logger.info("Plan generated successfully")
             return response.strip()
             
         except Exception as e:
-            logger.error(f"Failed to generate plan: {e}")
+            logger.error(f"❌ Failed to generate plan: {e}", exc_info=True)
             return f"Przepraszam, nie udało się wygenerować planu: {str(e)}"
     
     async def refine_plan(self, current_plan: str, feedback: str) -> str:
@@ -197,14 +198,15 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             )
             llm_client = LLMClient(model=self.model)
             
-            # Generate refined plan
-            response = llm_client.send(prompt)
+            # ✅ ASYNC call - won't block!
+            logger.info("🔄 Calling LLM to refine plan...")
+            response = await llm_client.send_async(prompt)
+            logger.info("✅ Plan refined successfully")
             
-            logger.info("Plan refined successfully")
             return response.strip()
             
         except Exception as e:
-            logger.error(f"Failed to refine plan: {e}")
+            logger.error(f"❌ Failed to refine plan: {e}", exc_info=True)
             return f"Przepraszam, nie udało się zaktualizować planu: {str(e)}"
     
     async def start_gathering(self, plan: str) -> str:
@@ -270,14 +272,20 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
         Returns:
             Response to user
         """
-        logger.info(f"Processing request in state: {self.state}")
+        logger.info(f"🟢 party_planner.process_request() STARTED")
+        logger.info(f"   Current state: {self.state}")
+        logger.info(f"   User input: {user_input[:100]}...")
         
         try:
             # INITIAL state - first message, generate plan
             if self.state == PlanState.INITIAL:
+                logger.info(f"   📝 State: INITIAL - generating plan...")
                 self.user_request = user_input
+                logger.info(f"   ⏳ Calling generate_plan()...")
                 self.current_plan = await self.generate_plan(user_input)
+                logger.info(f"   ✅ Plan generated, length: {len(self.current_plan)}")
                 self.state = PlanState.PLANNING
+                logger.info(f"   ✅ State changed to: PLANNING")
                 return self.current_plan
             
             # PLANNING or REFINEMENT - user is reviewing plan
@@ -300,7 +308,12 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
             
             # GATHERING - collecting contact info
             elif self.state == PlanState.GATHERING:
+                logger.info(f"   📝 State: GATHERING - processing user input...")
+                logger.info(f"   ⏳ Calling process_gathering()...")
                 response, is_complete = await self.process_gathering(user_input)
+                logger.info(f"   ✅ process_gathering() returned")
+                logger.info(f"   Is complete: {is_complete}")
+                logger.info(f"   Response: {response[:100]}...")
                 return response
             
             # SEARCHING - finding venues (auto-executed after gathering)

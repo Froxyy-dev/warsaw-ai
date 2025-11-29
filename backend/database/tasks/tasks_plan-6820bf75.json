@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-6820bf75",
+  "conversation_id": "",
+  "created_at": "2025-11-29T21:42:50.653030",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-8e9843bd",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 1 grudnia\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "AleGloria",
+          "phone": "+48 22 584 70 80"
+        },
+        {
+          "name": "Restauracja Belvedere",
+          "phone": "+48 606 102 002"
+        },
+        {
+          "name": "Restauracja Concept 13",
+          "phone": "+48 22 310 73 73"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-0058eef8",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Data odbioru: 1 grudnia\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "Cukiernie Sowa",
+          "phone": "+48 516 054 724"
+        },
+        {
+          "name": "Batida",
+          "phone": "+48 692 409 395"
+        },
+        {
+          "name": "Smaki Warszawy Cukiernia",
+          "phone": "+48 602 423 902"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

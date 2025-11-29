@@ -1,0 +1,26 @@
+{
+  "plan_id": "plan-f8a730fe",
+  "conversation_id": "",
+  "created_at": "2025-11-29T23:36:02.618202",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-4cafd354",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 1 grudnia 2025\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Restauracja Avangarda",
+          "phone": "+48 660 774 266"
+        },
+        {
+          "name": "Barka WIECZÓR NAD WISŁĄ",
+          "phone": "+48 668 707 370"
+        },
+        {
+          "name": "Restauracja Romantyczna",
+          "phone": "+48 726 34 36 34"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

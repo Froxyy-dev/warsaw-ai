@@ -60,17 +60,12 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 role = "Użytkownik" if msg.role == MessageRole.USER else "Asystent"
                 context += f"{role}: {msg.content}\n\n"
             
-            # Send system prompt with context
-            try:
-                client.send(f"{self.system_prompt}\n\n{context}")
-            except Exception as e:
-                logger.error(f"Failed to set context: {e}")
+            # ✅ SKIP context setting - it blocks! Just use system_instruction
+            # Context will be in the actual send later
+            pass
         else:
-            # Just send system prompt for new conversations
-            try:
-                client.send(self.system_prompt)
-            except Exception as e:
-                logger.error(f"Failed to send system prompt: {e}")
+            # No context needed for new conversations
+            pass
         
         return client
     
@@ -118,32 +113,41 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 )
                 
                 # Check if there's an active party plan for this conversation
+                logger.info(f"   🔍 Checking for existing party plan...")
                 plan = storage_manager.get_plan_by_conversation(conversation_id)
+                logger.info(f"   Plan found: {plan is not None}, State: {plan.state if plan else 'N/A'}")
                 
                 if plan and plan.state != PlanState.COMPLETE:
                     # Active party plan exists - route to party planner
-                    logger.info(f"Routing to party planner (state: {plan.state})")
+                    logger.info(f"   🎉 Routing to party planner (state: {plan.state})")
+                    logger.info(f"   ⏳ Calling _process_party_planning()...")
                     ai_content = await self._process_party_planning(
                         conversation_id,
                         content,
                         plan
                     )
+                    logger.info(f"   ✅ Party planning complete, response length: {len(ai_content)}")
                 elif self.party_planner.is_party_request(content):
                     # New party request detected
-                    logger.info("New party request detected, starting party planner")
+                    logger.info(f"   🎉 New party request detected, starting party planner")
+                    logger.info(f"   ⏳ Calling _start_party_planning()...")
                     ai_content = await self._start_party_planning(
                         conversation_id,
                         content
                     )
+                    logger.info(f"   ✅ Party planning started, response length: {len(ai_content)}")
                 else:
                     # Normal chat flow
-                    logger.info("Normal chat flow")
+                    logger.info(f"   💬 Normal chat flow")
+                    logger.info(f"   ⏳ Calling generate_ai_response()...")
                     ai_content = await self.generate_ai_response(
                         conversation.messages,
                         content
                     )
+                    logger.info(f"   ✅ Chat response generated, length: {len(ai_content)}")
                 
                 # Create assistant message
+                # ✅ Backend tells frontend whether to continue auto-refresh
                 assistant_message = Message(
                     id=str(uuid.uuid4()),
                     conversation_id=conversation_id,
@@ -151,7 +155,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     content=ai_content,
                     timestamp=datetime.now(),
                     metadata={
-                        "model": "gemini-2.5-flash"
+                        "model": "gemini-2.5-flash",
+                        "should_continue_refresh": False  # By default, stop and wait for user
                     }
                 )
                 
@@ -211,6 +216,9 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         user_input: str,
         plan: PartyPlan
     ) -> str:
+        logger.info(f"🟡 _process_party_planning() STARTED")
+        logger.info(f"   Plan state: {plan.state}")
+        logger.info(f"   User input: {user_input[:100]}...")
         """
         Continue an existing party planning session
         
@@ -235,9 +243,14 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         
         # Store the state BEFORE processing
         state_before = self.party_planner.state
+        logger.info(f"   State before: {state_before}")
         
         # Process user input
+        logger.info(f"   ⏳ Calling party_planner.process_request()...")
         response = await self.party_planner.process_request(user_input)
+        logger.info(f"   ✅ party_planner.process_request() returned")
+        logger.info(f"   State after: {self.party_planner.state}")
+        logger.info(f"   Response length: {len(response)}")
         
         # Check if we JUST TRANSITIONED to SEARCHING (gathering just completed)
         # Frontend will auto-refresh to see new messages as they appear
@@ -251,53 +264,80 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 role=MessageRole.ASSISTANT,
                 content="✅ Świetnie! Mam wszystkie potrzebne dane.\n\n🔍 Zaczynam wyszukiwanie lokali i cukierni...",
                 timestamp=datetime.now(),
-                metadata={"step": "search_starting"}
+                metadata={
+                    "step": "search_starting",
+                    "should_continue_refresh": True  # ✅ Keep refreshing - more coming!
+                }
             )
             storage_manager.add_message_to_conversation(conversation_id, progress_msg)
             logger.info("✅ Progress message saved - user can see we're starting")
             
-            # Step 1: Venue search
+            # Step 1: Venue search (with error handling)
             logger.info("🏢 Step 1: Searching venues...")
-            venue_response = await self.party_planner.search_venues_only()
+            try:
+                venue_response = await self.party_planner.search_venues_only()
+            except Exception as e:
+                logger.error(f"❌ Venue search failed: {e}", exc_info=True)
+                venue_response = f"❌ Nie udało się wyszukać lokali (błąd: {str(e)})\n\nKontynuuję wyszukiwanie cukierni..."
+            
             venue_msg = Message(
                 id=str(uuid.uuid4()),
                 conversation_id=conversation_id,
                 role=MessageRole.ASSISTANT,
                 content=venue_response,
                 timestamp=datetime.now(),
-                metadata={"step": "venue_search"}
+                metadata={
+                    "step": "venue_search",
+                    "should_continue_refresh": True  # ✅ Keep refreshing - bakery search coming!
+                }
             )
             storage_manager.add_message_to_conversation(conversation_id, venue_msg)
             logger.info("✅ Venue search message saved (frontend can now see it)")
             
-            # Step 2: Bakery search
+            # Step 2: Bakery search (with error handling)
             logger.info("🍰 Step 2: Searching bakeries...")
-            bakery_response = await self.party_planner.search_bakeries_only()
+            try:
+                bakery_response = await self.party_planner.search_bakeries_only()
+            except Exception as e:
+                logger.error(f"❌ Bakery search failed: {e}", exc_info=True)
+                bakery_response = f"❌ Nie udało się wyszukać cukierni (błąd: {str(e)})\n\nKontynuuję generowanie zadań..."
+            
             bakery_msg = Message(
                 id=str(uuid.uuid4()),
                 conversation_id=conversation_id,
                 role=MessageRole.ASSISTANT,
                 content=bakery_response,
                 timestamp=datetime.now(),
-                metadata={"step": "bakery_search"}
+                metadata={
+                    "step": "bakery_search",
+                    "should_continue_refresh": True  # ✅ Keep refreshing - task generation coming!
+                }
             )
             storage_manager.add_message_to_conversation(conversation_id, bakery_msg)
             logger.info("✅ Bakery search message saved (frontend can now see it)")
             
-            # Step 3: Task generation
+            # Step 3: Task generation (with error handling)
             logger.info("📋 Step 3: Generating tasks...")
-            task_response = await self.party_planner.generate_and_save_tasks()
+            try:
+                task_response = await self.party_planner.generate_and_save_tasks()
+            except Exception as e:
+                logger.error(f"❌ Task generation failed: {e}", exc_info=True)
+                task_response = f"❌ Nie udało się wygenerować zadań (błąd: {str(e)})\n\nSpróbuj ponownie lub skontaktuj się z supportem."
+            
             task_msg = Message(
                 id=str(uuid.uuid4()),
                 conversation_id=conversation_id,
                 role=MessageRole.ASSISTANT,
                 content=task_response,
                 timestamp=datetime.now(),
-                metadata={"step": "task_generation"}
+                metadata={
+                    "step": "task_generation",
+                    "should_continue_refresh": True  # ✅ KEEP refreshing - voice calls coming!
+                }
             )
             storage_manager.add_message_to_conversation(conversation_id, task_msg)
             logger.info("✅ Task generation message saved")
-            logger.info("🎉 All 3 messages saved! Frontend auto-refresh will show them.")
+            logger.info("🎉 All 3 messages saved! Voice agent execution will follow...")
             
             # ⭐ Check if we transitioned to EXECUTING (party_planner changed state)
             if self.party_planner.state == PlanState.EXECUTING:
@@ -306,6 +346,21 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 
                 if plan_id:
                     await self.execute_voice_agent_tasks(conversation_id, plan_id)
+                    
+                    # ✅ FINAL MESSAGE - everything is complete!
+                    completion_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content="🎉 **Wszystko gotowe!**\n\nWszystkie zadania zostały wykonane. Sprawdź powyższe wiadomości aby zobaczyć szczegóły połączeń.",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "step": "complete",
+                            "should_continue_refresh": False  # ✅ NOW we stop - all done!
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, completion_msg)
+                    logger.info("✅ Completion message saved - frontend will stop auto-refresh")
                     
                     # After execution, mark as complete
                     self.party_planner.state = PlanState.COMPLETE
@@ -336,7 +391,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             conversation_id: ID konwersacji
             plan_id: ID planu (do pobrania tasks z storage)
         """
-        from voice_agent import initiate_call, wait_for_conversation_completion, format_transcript, analyze_call_with_llm
+        from voice_agent import initiate_call_async, wait_for_conversation_completion_async, format_transcript, analyze_call_with_llm_async
         import time
         
         # Pobierz tasks z storage
@@ -360,7 +415,11 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 role=MessageRole.ASSISTANT,
                 content=f"📞 Zaczynam dzwonić do {task_type}...\n\nMam {len(task.places)} opcji do wypróbowania.",
                 timestamp=datetime.now(),
-                metadata={"task_id": task.task_id, "step": "task_start"}
+                metadata={
+                    "task_id": task.task_id,
+                    "step": "task_start",
+                    "should_continue_refresh": True  # ✅ Keep refreshing - calls coming!
+                }
             )
             storage_manager.add_message_to_conversation(conversation_id, intro_msg)
             
@@ -396,8 +455,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 )
                 storage_manager.add_message_to_conversation(conversation_id, calling_msg)
                 
-                # 2. Initiate call
-                call_result = initiate_call(task, place)
+                # 2. ✅ ASYNC: Initiate call
+                logger.info(f"   📞 Initiating call...")
+                call_result = await initiate_call_async(task, place)
+                logger.info(f"   ✅ Call initiated!")
                 
                 if not call_result or not call_result.get('conversation_id'):
                     # Call failed to initiate
@@ -407,7 +468,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         role=MessageRole.ASSISTANT,
                         content=f"❌ Nie udało się nawiązać połączenia z {place.name}.\n\nPróbuję kolejne miejsce...",
                         timestamp=datetime.now(),
-                        metadata={"step": "call_failed"}
+                        metadata={
+                            "step": "call_failed",
+                            "should_continue_refresh": True  # ✅ Trying next place!
+                        }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, error_msg)
                     place.phone = original_phone  # Restore
@@ -415,8 +479,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 
                 eleven_conversation_id = call_result['conversation_id']
                 
-                # 3. Wait for completion
-                conversation_data = wait_for_conversation_completion(eleven_conversation_id)
+                # 3. ✅ ASYNC: Wait for completion (won't block event loop!)
+                logger.info(f"   ⏳ Waiting for call to complete...")
+                conversation_data = await wait_for_conversation_completion_async(eleven_conversation_id)
+                logger.info(f"   ✅ Call completed!")
                 
                 if not conversation_data:
                     # Failed to get conversation data
@@ -490,7 +556,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 logger.info(f"🤖 Analyzing call with LLM...")
                 logger.info(f"   Transcript length for analysis: {len(transcript)} chars")
                 
-                analysis = analyze_call_with_llm(task, place, transcript)
+                # ✅ ASYNC call - won't block event loop
+                analysis = await analyze_call_with_llm_async(task, place, transcript)
                 
                 logger.info(f"✅ LLM analysis complete!")
                 logger.info(f"   Success: {analysis.get('success')}")
@@ -529,7 +596,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         metadata={
                             "task_id": task.task_id,
                             "step": "analysis",
-                            "analysis": analysis
+                            "analysis": analysis,
+                            "should_continue_refresh": True  # ✅ More tasks coming!
                         }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, success_msg)
@@ -557,7 +625,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         metadata={
                             "task_id": task.task_id,
                             "step": "analysis_retry",
-                            "analysis": analysis
+                            "analysis": analysis,
+                            "should_continue_refresh": True  # ✅ Trying next place!
                         }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, retry_msg)
@@ -617,9 +686,9 @@ Czy mogę Ci w czymś jeszcze pomóc?""",
             # Create LLM client with context
             client = self._create_llm_client(conversation_history)
             
-            # Generate response
+            # ✅ ASYNC: Generate response
             start_time = datetime.now()
-            response = client.send(user_message)
+            response = await client.send_async(user_message)
             processing_time = (datetime.now() - start_time).total_seconds()
             
             logger.info(f"Generated AI response in {processing_time:.2f}s")

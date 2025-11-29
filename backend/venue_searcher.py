@@ -80,8 +80,8 @@ Jeśli nie ma www, użyj: "brak strony"
             response = await self.llm_client.send_async(prompt)
             logger.info(f"✅ LLM responded, parsing results...")
             
-            # Parse the response
-            venues = self._parse_search_results(response, venue_type="restaurant")
+            # ✅ Parse the response (async)
+            venues = await self._parse_search_results(response, venue_type="restaurant")
             
             logger.info(f"✅ Found {len(venues)} venues")
             
@@ -127,8 +127,8 @@ Jeśli nie ma www, użyj: "brak strony"
             response = await self.llm_client.send_async(prompt)
             logger.info(f"✅ LLM responded, parsing results...")
             
-            # Parse the response
-            bakeries = self._parse_search_results(response, venue_type="bakery")
+            # ✅ Parse the response (async)
+            bakeries = await self._parse_search_results(response, venue_type="bakery")
             
             logger.info(f"✅ Found {len(bakeries)} bakeries")
             
@@ -149,9 +149,9 @@ Jeśli nie ma www, użyj: "brak strony"
                 searched_at=datetime.now()
             )
     
-    def _parse_search_results(self, text: str, venue_type: str) -> List[Venue]:
+    async def _parse_search_results(self, text: str, venue_type: str) -> List[Venue]:
         """
-        Parse LLM response to extract venue information using AI parsing
+        Parse LLM response to extract venue information using AI parsing (ASYNC)
         
         Args:
             text: LLM response text
@@ -182,9 +182,9 @@ WAŻNE:
 - Tylko numery telefonów polskie (+48)
 """
             
-            # Send to LLM
+            # ✅ ASYNC call to LLM
             parser_client = LLMClient(model=self.model)
-            response = parser_client.send(parsing_prompt)
+            response = await parser_client.send_async(parsing_prompt)
             
             # Clean response - remove markdown code blocks if present
             response = response.strip()

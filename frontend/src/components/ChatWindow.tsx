@@ -64,10 +64,17 @@ export function ChatWindow() {
     const intervalId = setInterval(async () => {
       try {
         refreshCount++;
-        console.log(`🔄 Auto-refresh #${refreshCount} - fetching conversation ${conversationId}...`);
+        console.log('─────────────────────────────────────');
+        console.log(`🔄 Auto-refresh #${refreshCount}`);
+        console.log(`   Conversation: ${conversationId}`);
+        console.log(`   Current messages: ${messages.length}`);
+        console.log(`   Fetching GET /conversations/${conversationId}...`);
         
+        const startFetch = Date.now();
         const conv = await getConversation(conversationId);
-        console.log(`📥 Received conversation with ${conv.messages.length} messages`);
+        const fetchDuration = Date.now() - startFetch;
+        console.log(`📥 Received conversation in ${fetchDuration}ms`);
+        console.log(`   Messages in response: ${conv.messages.length}`);
         
         // ALWAYS update messages in state - to jest kluczowe!
         setMessages(conv.messages);
@@ -80,21 +87,40 @@ export function ChatWindow() {
           const lastMessage = conv.messages[conv.messages.length - 1];
           console.log('📨 Last message:', { role: lastMessage.role, preview: lastMessage.content.substring(0, 50) });
           
-          // If last message is from assistant, we're done!
+          // ✅ Backend tells us explicitly whether to continue refreshing
           if (lastMessage.role === 'assistant') {
-            console.log('✅ Got assistant response! Stopping auto-refresh');
-            setIsLoading(false);
-            setIsSearching(false);
-            clearInterval(intervalId);
-            return;
+            const metadata = lastMessage.metadata || {};
+            
+            // Check the explicit flag from backend
+            const shouldContinue = metadata.should_continue_refresh;
+            
+            if (shouldContinue === false) {
+              console.log('✅ Backend says: STOP auto-refresh (waiting for user input)');
+              console.log('   Step:', metadata.step || 'unknown');
+              console.log('   Metadata:', metadata);
+              setIsLoading(false);
+              setIsSearching(false);
+              clearInterval(intervalId);
+              return;
+            } else if (shouldContinue === true) {
+              console.log('📨 Backend says: CONTINUE auto-refresh (more messages coming)');
+              console.log('   Step:', metadata.step || 'unknown');
+            } else {
+              // Fallback if flag not set - assume we should stop
+              console.log('⚠️ No should_continue_refresh flag - assuming STOP');
+              setIsLoading(false);
+              setIsSearching(false);
+              clearInterval(intervalId);
+              return;
+            }
           }
         } else {
           console.log('⏳ No new messages yet, continuing to poll...');
         }
         
-        // Safety timeout: 5 minutes (60 * 5 seconds = 300 seconds)
-        if (refreshCount > 60) {
-          console.log('⏱️ Auto-refresh timeout after 5 minutes');
+        // Safety timeout: 2 minutes (24 * 5 seconds = 120 seconds)
+        if (refreshCount > 24) {
+          console.log('⏱️ Auto-refresh timeout after 2 minutes');
           setIsLoading(false);
           setIsSearching(false);
           clearInterval(intervalId);
@@ -138,13 +164,27 @@ export function ChatWindow() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('═══════════════════════════════════════');
+    console.log('🚀 handleSendMessage() STARTED');
+    console.log('═══════════════════════════════════════');
+    
     if (!inputValue.trim() || isLoading) {
+      console.log('⚠️ Aborting - empty input or already loading');
       return;
     }
 
     const messageContent = inputValue.trim();
+    console.log('📝 Message content:', messageContent);
+    console.log('📊 Current state:', {
+      messagesCount: messages.length,
+      conversationId,
+      isLoading,
+      isSearching
+    });
+    
     setInputValue('');
     setError(null);
+    console.log('✅ Input cleared, error cleared');
 
     // Optimistic update - add user message immediately
     const userMessage: Message = {
@@ -155,23 +195,51 @@ export function ChatWindow() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    console.log('✅ Optimistic user message added:', userMessage.id);
     setIsLoading(true);
+    console.log('✅ isLoading set to TRUE');
 
     try {
+      console.log('──────────────────────────────────────');
+      console.log('Step 1: Ensure conversation exists');
       // Ensure conversation exists
       const convId = await ensureConversation();
       console.log('✅ Conversation ID:', convId);
+      console.log('──────────────────────────────────────');
       
-      // Send message to backend (this is async - backend will process in background)
-      console.log('📤 Sending message to backend:', messageContent);
+      console.log('──────────────────────────────────────');
+      console.log('Step 2: Send message to backend');
+      console.log('📤 Message:', messageContent);
+      console.log('📊 State before send:', {
+        conversationId: convId,
+        currentMessageCount: messages.length,
+        isSearching,
+        isLoading
+      });
       
       // Start auto-refresh BEFORE sending - to catch updates
+      console.log('──────────────────────────────────────');
+      console.log('Step 3: Enable auto-refresh');
       setIsSearching(true);
+      console.log('✅ isSearching set to TRUE');
+      console.log('   Auto-refresh useEffect will trigger now');
       
       // Send the message (this triggers backend processing)
+      console.log('──────────────────────────────────────');
+      console.log('Step 4: POST to backend');
+      console.log('⏳ Calling sendMessageApi()...');
+      console.log('   URL: POST /api/chat/conversations/' + convId + '/messages');
+      console.log('   Payload: { content: "' + messageContent + '" }');
+      const startTime = Date.now();
+      
       await sendMessageApi(convId, messageContent);
-      console.log('✅ Message sent to backend - processing started');
-      console.log('🔄 Auto-refresh is now active and will fetch updates every 2 seconds');
+      
+      const duration = Date.now() - startTime;
+      console.log(`✅ sendMessageApi() completed in ${duration}ms`);
+      console.log('──────────────────────────────────────');
+      console.log('✅ SUCCESS - message sent!');
+      console.log('🔄 Auto-refresh is active and will poll every 5s');
+      console.log('═══════════════════════════════════════');
 
       // Note: Auto-refresh useEffect will now take over and:
       // 1. Fetch conversation every 2 seconds
@@ -179,15 +247,36 @@ export function ChatWindow() {
       // 3. Stop when assistant responds
 
     } catch (err: any) {
-      console.error('❌ Failed to send message:', err);
-      console.error('Error details:', err.response?.data || err.message);
+      console.log('═══════════════════════════════════════');
+      console.error('❌❌❌ SEND MESSAGE FAILED! ❌❌❌');
+      console.log('═══════════════════════════════════════');
+      console.error('Error object:', err);
+      console.error('Error message:', err.message);
+      console.error('Error name:', err.name);
+      console.error('Error code:', err.code);
+      console.error('Response status:', err.response?.status);
+      console.error('Response data:', err.response?.data);
+      console.error('Response headers:', err.response?.headers);
+      console.error('Request URL:', err.config?.url);
+      console.error('Request method:', err.config?.method);
+      console.error('Request data:', err.config?.data);
+      console.log('═══════════════════════════════════════');
+      console.error('🔍 BACKEND CRASHNĄŁ!');
+      console.error('   → Sprawdź terminal gdzie uvicorn działa');
+      console.error('   → Szukaj czerwonego erroru (Traceback)');
+      console.error('   → Skopiuj WSZYSTKIE logi od 📥 do ❌');
+      console.log('═══════════════════════════════════════');
+      
       setError(`Error: ${err.response?.data?.detail || err.message || 'Failed to send message'}`);
       // Remove optimistic user message on error
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+      console.log('✅ Removed optimistic message from UI');
       // Restore input value
       setInputValue(messageContent);
+      console.log('✅ Restored input value');
       setIsLoading(false);
       setIsSearching(false);
+      console.log('✅ State reset: isLoading=false, isSearching=false');
     }
   };
 

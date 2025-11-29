@@ -49,8 +49,22 @@ Gdy zebrano WSZYSTKO, zwróć JSON:
     
     async def process_message_async(self, message: str):
         """Async version - non-blocking"""
-        response = await self.llm_client.send_async(message)
-        return self._parse_response(response)
+        try:
+            response = await self.llm_client.send_async(message)
+            return self._parse_response(response)
+        except Exception as e:
+            # Handle API errors (429, timeouts, etc)
+            error_msg = str(e)
+            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "quota" in error_msg.lower():
+                return {
+                    "type": "chat",
+                    "text": "❌ Przepraszam, API Gemini przekroczyło limit requestów. Spróbuj za chwilę lub użyj innego klucza API."
+                }
+            else:
+                return {
+                    "type": "chat", 
+                    "text": f"❌ Błąd podczas przetwarzania: {error_msg}"
+                }
     
     def _parse_response(self, text: str):
         """Parse LLM response to extract structured data"""

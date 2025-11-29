@@ -143,15 +143,37 @@ async def send_message(
         
         # NOW: Process message and generate AI response (this takes time)
         logger.info(f"🤖 Starting AI processing for conversation {conversation_id}...")
+        logger.info(f"   Message content: {message_request.content}")
+        logger.info(f"   Calling chat_service.process_user_message()...")
         try:
+            logger.info(f"   ⏳ Awaiting process_user_message()...")
             _, assistant_message = await chat_service.process_user_message(
                 conversation_id,
                 message_request.content
             )
-            logger.info(f"✅ AI processing complete")
+            logger.info(f"✅ AI processing complete!")
+            logger.info(f"   Assistant message ID: {assistant_message.id}")
+            logger.info(f"   Assistant message preview: {assistant_message.content[:50]}...")
         except Exception as ai_error:
             logger.error(f"❌ AI processing failed: {ai_error}", exc_info=True)
-            raise HTTPException(status_code=500, detail=f"AI processing failed: {str(ai_error)}")
+            
+            # ✅ DONT CRASH - save error message for user!
+            error_message = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=f"❌ Przepraszam, wystąpił błąd podczas przetwarzania:\n\n`{str(ai_error)}`\n\nSpróbuj ponownie lub sformułuj zapytanie inaczej.",
+                timestamp=datetime.utcnow(),
+                metadata={
+                    "error": True,
+                    "should_continue_refresh": False  # ✅ Stop - wait for user
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, error_message)
+            logger.info(f"✅ Error message saved for user")
+            
+            # Return error message instead of crashing
+            assistant_message = error_message
         
         # Save assistant message
         logger.info(f"💾 Saving assistant message...")
@@ -172,7 +194,22 @@ async def send_message(
         raise
     except Exception as e:
         logger.error(f"❌ CRITICAL ERROR in send_message: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+        
+        # ✅ Last resort - save error and return it instead of 500
+        try:
+            error_message = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=f"❌ Wystąpił nieoczekiwany błąd:\n\n`{str(e)}`\n\nZapiszę to i naprawię. Spróbuj ponownie.",
+                timestamp=datetime.utcnow(),
+                metadata={"critical_error": True}
+            )
+            storage_manager.add_message_to_conversation(conversation_id, error_message)
+            return error_message
+        except:
+            # If even saving fails, then raise 500
+            raise HTTPException(status_code=500, detail=f"Critical error: {str(e)}")
 
 
 @router.delete("/conversations/{conversation_id}")
