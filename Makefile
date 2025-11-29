@@ -19,7 +19,7 @@ setup:
 
 run-backend:
 	@echo "🚀 Starting FastAPI backend..."
-	cd backend && source .venv/bin/activate && uvicorn main:app --reload --host 0.0.0.0 --port 8000
+	cd backend && source .venv/bin/activate && uvicorn main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
 
 run-frontend:
 	@echo "🚀 Starting React frontend..."

@@ -1,0 +1,23 @@
+{
+  "id": "a8bc2eaf-3a48-4ee6-8343-1d95f5de570a",
+  "conversation_id": "d3395116-0bf6-4fd2-b7b8-965b9ea9d761",
+  "user_request": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
+  "current_plan": "Oto zaktualizowany plan:\n\n**Zadzwonić do lokalu/restauracji z instrukcjami:**\n- Rezerwacja: 1 grudnia, 16:00-21:00.\n- Liczba osób: 10.\n- Urodzinowa impreza, strefa prywatna.\n- Zamówić menu, napoje, kuchnia polska.\n\n**Zadzwonić do cukierni z instrukcjami:**\n- Zamówić tort urodzinowy profesjonalnej cukierni.\n- Napis na torcie: Wszystkiego najlepszego Ada.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+  "plan_items": [],
+  "state": "complete",
+  "gathered_info": {
+    "full_name": "Mateusz Winiarek",
+    "phone": "886859039",
+    "date": "1 grudnia 2025",
+    "time": "16:00",
+    "location": "Warszawa",
+    "guests": "10",
+    "duration": "5 godzin",
+    "plan_id": "plan-31c980ff"
+  },
+  "feedback_history": [
+    "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska."
+  ],
+  "created_at": "2025-11-30T00:26:44.338671",
+  "updated_at": "2025-11-30T00:27:45.267116"
+}

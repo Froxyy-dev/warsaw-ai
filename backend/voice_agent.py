@@ -6,6 +6,7 @@ import os
 import requests
 import time
 import asyncio
+import httpx
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 
@@ -72,6 +73,120 @@ def initiate_call(task: Task, place: Place) -> Optional[Dict[str, Any]]:
     except requests.exceptions.RequestException as e:
         print(f"❌ Failed to initiate call: {e}")
         return None
+
+
+async def initiate_call_async(task: Task, place: Place) -> Optional[Dict[str, Any]]:
+    """
+    ✅ ASYNC: Inicjuje połączenie głosowe do wybranego miejsca (NON-BLOCKING).
+    
+    Args:
+        task: Task z instrukcjami dla agenta
+        place: Miejsce do którego dzwonimy
+        
+    Returns:
+        Dict z conversation_id i callSid lub None
+    """
+    payload = {
+        "agent_id": ELEVEN_AGENT_ID,
+        "agent_phone_number_id": ELEVEN_AGENT_PHONE_NUMBER_ID,
+        "to_number": place.phone,
+        "conversation_initiation_client_data": {
+            "type": "conversation_initiation_client_data",
+            "dynamic_variables": {
+                "_notes_for_agent_": task.notes_for_agent,
+                "_place_name_": place.name,
+            }
+        }
+    }
+
+    headers = {
+        "xi-api-key": ELEVEN_API_KEY,
+        "Content-Type": "application/json",
+    }
+
+    print(f"\n{'='*60}")
+    print(f"📞 Initiating call (ASYNC) to: {place.name} ({place.phone})")
+    print(f"{'='*60}\n")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(OUTBOUND_CALL_URL, json=payload, headers=headers, timeout=30.0)
+            resp.raise_for_status()
+            
+            result = resp.json()
+            
+            print(f"✅ Call initiated successfully!")
+            print(f"   Conversation ID: {result.get('conversation_id', 'N/A')}")
+            print(f"   Call SID: {result.get('callSid', 'N/A')}\n")
+            
+            return result
+        
+    except httpx.HTTPStatusError as e:
+        print(f"❌ Failed to initiate call (HTTP {e.response.status_code}): {e}")
+        return None
+    except Exception as e:
+        print(f"❌ Failed to initiate call: {e}")
+        return None
+
+
+async def wait_for_conversation_completion_async(
+    conversation_id: str, 
+    max_wait_seconds: int = 240,
+    check_interval: int = 3
+) -> Optional[Dict[str, Any]]:
+    """
+    ✅ ASYNC: Czeka aż rozmowa się zakończy (NON-BLOCKING).
+    
+    Args:
+        conversation_id: ID konwersacji z ElevenLabs
+        max_wait_seconds: Max czas oczekiwania
+        check_interval: Co ile sekund sprawdzać status
+        
+    Returns:
+        Dict z danymi konwersacji lub None
+    """
+    headers = {"xi-api-key": ELEVEN_API_KEY}
+    url = CONVERSATION_URL_TEMPLATE.format(conversation_id=conversation_id)
+    
+    print(f"⏳ Waiting for conversation to complete (ASYNC) (max {max_wait_seconds}s)...")
+    
+    elapsed = 0
+    
+    async with httpx.AsyncClient() as client:
+        while elapsed < max_wait_seconds:
+            try:
+                resp = await client.get(url, headers=headers, timeout=30.0)
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    status = data.get('status', 'unknown')
+                    
+                    # Show progress
+                    print(f"   Status: {status} ({int(elapsed)}s)", end='\r')
+                    
+                    if status == 'done':
+                        print(f"\n✅ Conversation completed! ({int(elapsed)}s)\n")
+                        return data
+                    elif status in ['failed', 'error']:
+                        print(f"\n❌ Conversation failed: {status}\n")
+                        return data
+                        
+                elif resp.status_code == 404:
+                    print(f"\n❌ Conversation not found\n")
+                    return None
+                else:
+                    print(f"\n⚠️  Unexpected status code: {resp.status_code}\n")
+                
+                # ✅ ASYNC sleep - won't block event loop
+                await asyncio.sleep(check_interval)
+                elapsed += check_interval
+                
+            except Exception as e:
+                print(f"\n❌ Error: {e}\n")
+                return None
+    
+    print(f"\n⏰ Timeout after {max_wait_seconds}s\n")
+    return None
 
 
 def wait_for_conversation_completion(
@@ -419,57 +534,46 @@ def _parse_llm_analysis(response: str) -> Dict[str, Any]:
     
     # Try 2: Parse entire response as JSON (if not wrapped)
     if not llm_result:
+        try:
+            llm_result = json.loads(response)
+            print(f"✅ Parsed response as raw JSON")
+        except json.JSONDecodeError:
+            pass
+    
+    # Try 3: Find any JSON object in response
+    if not llm_result:
+        json_match = re.search(r'(\{[^{]*"success"[^}]*\})', response, re.DOTALL)
+        if json_match:
+            print(f"✅ Extracting JSON object from text...")
             try:
-                llm_result = json.loads(response)
-                print(f"✅ Parsed response as raw JSON")
+                llm_result = json.loads(json_match.group(1))
             except json.JSONDecodeError:
                 pass
-        
-        # Try 3: Find any JSON object in response
-        if not llm_result:
-            json_match = re.search(r'(\{[^{]*"success"[^}]*\})', response, re.DOTALL)
-            if json_match:
-                print(f"✅ Extracting JSON object from text...")
-                try:
-                    llm_result = json.loads(json_match.group(1))
-                except json.JSONDecodeError:
-                    pass
-        
-        if not llm_result:
-            raise ValueError("Could not extract valid JSON from LLM response")
-        
-        # 🔍 VERBOSE: Show parsed result
-        print(f"✅ Analysis complete!")
-        print(f"   Model: gemini-2.5-flash")
-        print(f"\n📊 Parsed result:")
-        print(f"   ✓ Success: {llm_result.get('success', False)}")
-        print(f"   ✓ Should continue: {llm_result.get('should_continue', True)}")
-        print(f"   ✓ Confidence: {llm_result.get('confidence', 0.0):.2f}")
-        print(f"   ✓ Reason: {llm_result.get('reason', 'N/A')[:100]}")
-        if llm_result.get('appointment_details'):
-            print(f"   ✓ Details: {llm_result.get('appointment_details')}")
-        print()
-        
-        return {
-            "success": llm_result.get("success", False),
-            "should_continue": llm_result.get("should_continue", True),
-            "reason": llm_result.get("reason", "No reason provided"),
-            "confidence": llm_result.get("confidence", 0.0),
-            "appointment_details": llm_result.get("appointment_details", {}),
-            "llm_response": llm_result,
-            "llm_raw_response": response  # Keep raw for debugging
-        }
-    except ValueError as e:
-        print(f"❌ Failed to extract JSON: {e}")
-        print(f"   Raw response (first 300 chars): {response[:300]}...")
-        llm_result = None
-    except Exception as e:
-        print(f"❌ LLM error: {e}")
-        import traceback
-        print(f"   Traceback:")
-        traceback.print_exc()
-        print(f"   Raw response (first 300 chars): {response[:300] if 'response' in locals() else 'N/A'}...")
-        llm_result = None
+    
+    if not llm_result:
+        raise ValueError("Could not extract valid JSON from LLM response")
+    
+    # 🔍 VERBOSE: Show parsed result
+    print(f"✅ Analysis complete!")
+    print(f"   Model: gemini-2.5-flash")
+    print(f"\n📊 Parsed result:")
+    print(f"   ✓ Success: {llm_result.get('success', False)}")
+    print(f"   ✓ Should continue: {llm_result.get('should_continue', True)}")
+    print(f"   ✓ Confidence: {llm_result.get('confidence', 0.0):.2f}")
+    print(f"   ✓ Reason: {llm_result.get('reason', 'N/A')[:100]}")
+    if llm_result.get('appointment_details'):
+        print(f"   ✓ Details: {llm_result.get('appointment_details')}")
+    print()
+    
+    return {
+        "success": llm_result.get("success", False),
+        "should_continue": llm_result.get("should_continue", True),
+        "reason": llm_result.get("reason", "No reason provided"),
+        "confidence": llm_result.get("confidence", 0.0),
+        "appointment_details": llm_result.get("appointment_details", {}),
+        "llm_response": llm_result,
+        "llm_raw_response": response  # Keep raw for debugging
+    }
     
     if not llm_result:
         # Fallback - prosta heurystyka

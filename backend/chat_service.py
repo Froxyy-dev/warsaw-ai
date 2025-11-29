@@ -341,26 +341,14 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             
             # ⭐ Check if we transitioned to EXECUTING (party_planner changed state)
             if self.party_planner.state == PlanState.EXECUTING:
-                logger.info("📞 Starting voice agent execution...")
+                logger.info("📞 Starting voice agent execution IN BACKGROUND...")
                 plan_id = self.party_planner.gathered_info.get("plan_id")
                 
                 if plan_id:
-                    await self.execute_voice_agent_tasks(conversation_id, plan_id)
-                    
-                    # ✅ FINAL MESSAGE - everything is complete!
-                    completion_msg = Message(
-                        id=str(uuid.uuid4()),
-                        conversation_id=conversation_id,
-                        role=MessageRole.ASSISTANT,
-                        content="🎉 **Wszystko gotowe!**\n\nWszystkie zadania zostały wykonane. Sprawdź powyższe wiadomości aby zobaczyć szczegóły połączeń.",
-                        timestamp=datetime.now(),
-                        metadata={
-                            "step": "complete",
-                            "should_continue_refresh": False  # ✅ NOW we stop - all done!
-                        }
-                    )
-                    storage_manager.add_message_to_conversation(conversation_id, completion_msg)
-                    logger.info("✅ Completion message saved - frontend will stop auto-refresh")
+                    # ✅ RUN IN BACKGROUND - don't await! Return immediately!
+                    import asyncio
+                    asyncio.create_task(self._execute_voice_agent_in_background(conversation_id, plan_id))
+                    logger.info("✅ Voice agent started in background - request can return now!")
                     
                     # After execution, mark as complete
                     self.party_planner.state = PlanState.COMPLETE
@@ -379,6 +367,48 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         
         return response
     
+    async def _execute_voice_agent_in_background(
+        self,
+        conversation_id: str,
+        plan_id: str
+    ) -> None:
+        """
+        Wrapper that runs voice agent in background and adds completion message
+        """
+        try:
+            await self.execute_voice_agent_tasks(conversation_id, plan_id)
+            
+            # ✅ FINAL MESSAGE - everything is complete!
+            completion_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content="🎉 **Wszystko gotowe!**\n\nWszystkie zadania zostały wykonane. Sprawdź powyższe wiadomości aby zobaczyć szczegóły połączeń.",
+                timestamp=datetime.now(),
+                metadata={
+                    "step": "complete",
+                    "should_continue_refresh": False  # ✅ NOW we stop - all done!
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, completion_msg)
+            logger.info("✅ Voice agent completed - completion message saved")
+            
+        except Exception as e:
+            logger.error(f"❌ Voice agent background task failed: {e}", exc_info=True)
+            error_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=f"❌ Wystąpił błąd podczas wykonywania połączeń: {str(e)}",
+                timestamp=datetime.now(),
+                metadata={
+                    "step": "error",
+                    "error": True,
+                    "should_continue_refresh": False
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, error_msg)
+    
     async def execute_voice_agent_tasks(
         self,
         conversation_id: str,
@@ -391,24 +421,41 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             conversation_id: ID konwersacji
             plan_id: ID planu (do pobrania tasks z storage)
         """
+        logger.info("="*70)
+        logger.info("🎙️  STARTING VOICE AGENT EXECUTION")
+        logger.info("="*70)
+        logger.info(f"   Conversation ID: {conversation_id}")
+        logger.info(f"   Plan ID: {plan_id}")
+        
         from voice_agent import initiate_call_async, wait_for_conversation_completion_async, format_transcript, analyze_call_with_llm_async
         import time
         
+        logger.info("✅ Voice agent functions imported")
+        
         # Pobierz tasks z storage
+        logger.info(f"📂 Loading tasks from storage for plan_id: {plan_id}")
         tasks = storage_manager.load_task_list(plan_id)
+        
         if not tasks:
-            logger.error(f"No tasks found for plan_id: {plan_id}")
+            logger.error(f"❌ No tasks found for plan_id: {plan_id}")
             return
         
-        logger.info(f"🎯 Executing {len(tasks)} tasks...")
+        logger.info(f"✅ Loaded {len(tasks)} tasks")
+        logger.info(f"🎯 Starting execution...")
         
         for task_idx, task in enumerate(tasks):
             # Task already loaded from storage (Task object)
             
-            logger.info(f"📋 Task {task_idx + 1}/{len(tasks)}: {task.task_id}")
+            logger.info("─"*70)
+            logger.info(f"📋 TASK {task_idx + 1}/{len(tasks)}")
+            logger.info("─"*70)
+            logger.info(f"   Task ID: {task.task_id}")
+            logger.info(f"   Places to call: {len(task.places)}")
             
             # Send initial message about this task
             task_type = "lokal/restaurację" if "restaurant" in task.task_id else "cukiernię"
+            
+            logger.info(f"💬 Creating intro message for {task_type}...")
             intro_msg = Message(
                 id=str(uuid.uuid4()),
                 conversation_id=conversation_id,
@@ -421,17 +468,27 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     "should_continue_refresh": True  # ✅ Keep refreshing - calls coming!
                 }
             )
+            logger.info(f"💾 Saving intro message to conversation...")
             storage_manager.add_message_to_conversation(conversation_id, intro_msg)
+            logger.info(f"✅ Intro message saved")
             
             # Try each place until success
+            logger.info(f"🔄 Starting to call {len(task.places)} places...")
+            
             for place_idx, place in enumerate(task.places):
-                logger.info(f"📞 Calling place {place_idx + 1}/{len(task.places)}: {place.name}")
+                logger.info("")
+                logger.info("┌" + "─"*68 + "┐")
+                logger.info(f"│ 📞 PLACE {place_idx + 1}/{len(task.places)}: {place.name[:50].ljust(50)} │")
+                logger.info("└" + "─"*68 + "┘")
+                logger.info(f"   Original phone: {place.phone}")
                 
                 # OVERRIDE phone number for POC
                 original_phone = place.phone
                 place.phone = "+48886859039"  # HARDCODED FOR POC
+                logger.info(f"   ⚠️  OVERRIDING phone to: {place.phone} (POC)")
                 
                 # 1. Send "Calling..." message
+                logger.info(f"   💬 Creating 'calling' message...")
                 calling_msg_content = f"""📞 Dzwonię do: **{place.name}**
 📱 Numer: {place.phone}
 
@@ -453,12 +510,23 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         "step": "calling"
                     }
                 )
+                logger.info(f"   💾 Saving 'calling' message...")
                 storage_manager.add_message_to_conversation(conversation_id, calling_msg)
+                logger.info(f"   ✅ 'Calling' message saved")
                 
                 # 2. ✅ ASYNC: Initiate call
-                logger.info(f"   📞 Initiating call...")
-                call_result = await initiate_call_async(task, place)
-                logger.info(f"   ✅ Call initiated!")
+                logger.info(f"   📞 Calling initiate_call_async()...")
+                logger.info(f"      Task: {task.task_id}")
+                logger.info(f"      Place: {place.name}")
+                logger.info(f"      Phone: {place.phone}")
+                
+                try:
+                    call_result = await initiate_call_async(task, place)
+                    logger.info(f"   ✅ initiate_call_async() returned!")
+                    logger.info(f"      Result: {call_result}")
+                except Exception as e:
+                    logger.error(f"   ❌ initiate_call_async() FAILED: {e}", exc_info=True)
+                    call_result = None
                 
                 if not call_result or not call_result.get('conversation_id'):
                     # Call failed to initiate
@@ -480,12 +548,20 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 eleven_conversation_id = call_result['conversation_id']
                 
                 # 3. ✅ ASYNC: Wait for completion (won't block event loop!)
-                logger.info(f"   ⏳ Waiting for call to complete...")
-                conversation_data = await wait_for_conversation_completion_async(eleven_conversation_id)
-                logger.info(f"   ✅ Call completed!")
+                logger.info(f"   ⏳ Calling wait_for_conversation_completion_async()...")
+                logger.info(f"      Conversation ID: {eleven_conversation_id}")
+                
+                try:
+                    conversation_data = await wait_for_conversation_completion_async(eleven_conversation_id)
+                    logger.info(f"   ✅ wait_for_conversation_completion_async() returned!")
+                    logger.info(f"      Status: {conversation_data.get('status') if conversation_data else 'None'}")
+                except Exception as e:
+                    logger.error(f"   ❌ wait_for_conversation_completion_async() FAILED: {e}", exc_info=True)
+                    conversation_data = None
                 
                 if not conversation_data:
                     # Failed to get conversation data
+                    logger.warning(f"   ⚠️  No conversation data received")
                     error_msg = Message(
                         id=str(uuid.uuid4()),
                         conversation_id=conversation_id,
