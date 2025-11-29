@@ -34,3 +34,6 @@ clean:
 	rm -rf backend/.venv
 	rm -rf frontend/node_modules
 	@echo "✅ Cleanup complete!"
+
+install-req:
+	pip install -r backend/requirements.txt
