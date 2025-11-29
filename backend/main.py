@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import calls, appointments
+from routers import calls, appointments, chat, voice
 import dotenv 
 dotenv.load_dotenv()
 
@@ -22,6 +22,8 @@ app.add_middleware(
 # Include routers
 app.include_router(calls.router, prefix="/api/calls", tags=["calls"])
 app.include_router(appointments.router, prefix="/api/appointments", tags=["appointments"])
+app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
+app.include_router(voice.router, prefix="/api/voice", tags=["voice"])
 
 @app.get("/")
 async def root():
@@ -34,4 +36,3 @@ async def root():
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
-

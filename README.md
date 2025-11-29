@@ -74,14 +74,23 @@ warsaw-ai/
 - ✅ Zarządzanie wizytami
 - ✅ REST API z dokumentacją (FastAPI)
 - ✅ Nowoczesny interfejs użytkownika (React)
+- ✅ **Chat AI z integracją Gemini** - Multiturn konwersacje z AI agentem
+- ✅ **Persystencja konwersacji** - Lokalne przechowywanie w JSON
+- ✅ **🎉 Party Planner** - Inteligentne planowanie imprez z iteracyjnym refinementem
+  - Automatyczne wykrywanie party requests
+  - Generowanie szczegółowych planów
+  - Modyfikacja planów na podstawie feedbacku
+  - Zbieranie danych kontaktowych
+  - State persistence między sesjami
 
 ### Do implementacji:
 - 🔄 Integracja z Twilio (dla prawdziwych połączeń)
-- 🔄 Integracja z OpenAI (dla konwersacji AI)
-- 🔄 Baza danych (PostgreSQL/MongoDB)
+- 🔄 Baza danych (PostgreSQL/MongoDB) - obecnie używamy JSON storage
 - 🔄 Automatyczne transkrypcje rozmów
 - 🔄 System powiadomień
 - 🔄 Kalendarz i synchronizacja wizyt
+- 🔄 WebSocket dla real-time chat updates
+- 🔄 Streaming AI responses
 
 ## 🔧 API Endpointy
 
@@ -98,6 +107,14 @@ warsaw-ai/
 - `GET /api/appointments/{appointment_id}` - Pobierz szczegóły wizyty
 - `PATCH /api/appointments/{appointment_id}/status` - Zaktualizuj status wizyty
 - `DELETE /api/appointments/{appointment_id}` - Usuń wizytę
+
+### Chat (Konwersacje AI)
+- `POST /api/chat/conversations/` - Utwórz nową konwersację
+- `GET /api/chat/conversations/` - Pobierz listę konwersacji
+- `GET /api/chat/conversations/{conversation_id}` - Pobierz konwersację z historią
+- `POST /api/chat/conversations/{conversation_id}/messages` - Wyślij wiadomość
+- `DELETE /api/chat/conversations/{conversation_id}` - Usuń konwersację
+- `GET /api/chat/conversations/{conversation_id}/messages` - Pobierz wiadomości (z paginacją)
 
 ## 🔑 Konfiguracja (TODO)
 

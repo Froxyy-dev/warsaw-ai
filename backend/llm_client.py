@@ -6,15 +6,13 @@ import os
 load_dotenv()
 
 class LLMClient:
-    def __init__(self, model: str = "gemini-2.0-flash-exp", system_instruction: str = ""):
+    def __init__(self, model: str = "gemini-2.5-flash", system_instruction: str = None):
         """
         Initialize the Gemini Client with a chat session.
         
         Args:
-            model: The model to use. 
-                   (Note: 'gemini-2.5-flash' in your snippet may be a future/private 
-                   version. I've defaulted to '2.0-flash-exp' for public compatibility,
-                   but you can pass 'gemini-2.5-flash' if you have access).
+            model: The model to use. Default is gemini-2.5-flash.
+            system_instruction: Optional system instruction for the model.
         """
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
@@ -28,10 +26,16 @@ class LLMClient:
             google_search=types.GoogleSearch()
         )
 
-        self.config = types.GenerateContentConfig(
-            tools=[grounding_tool],
-            system_instruction=self.system_instruction
-        )
+        # Create config with or without system instruction
+        if self.system_instruction:
+            self.config = types.GenerateContentConfig(
+                tools=[grounding_tool],
+                system_instruction=self.system_instruction
+            )
+        else:
+            self.config = types.GenerateContentConfig(
+                tools=[grounding_tool]
+            )
 
         
         # Initialize the chat session immediately
@@ -71,6 +75,28 @@ class LLMClient:
         
         return ''.join(response_chunks)
 
+    def transcribe(self, audio_bytes: bytes, mime_type: str) -> str:
+        """
+        Transcribes an audio file using the generative model.
+        
+        Args:
+            audio_bytes: The audio file content in bytes.
+            mime_type: The MIME type of the audio file.
+            
+        Returns:
+            The transcribed text.
+        """
+        try:
+            part = types.Part.from_bytes(data=audio_bytes, mime_type=mime_type)
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=['transcribe this audio', part]
+            )
+            return response.text
+        except Exception as e:
+            print(f"An error occurred during transcription: {e}")
+            return ""
+
     def get_history(self):
         """
         Retrieves the conversation history.
@@ -81,7 +107,7 @@ class LLMClient:
         """
         Resets the conversation history by creating a new chat session.
         """
-        self.chat_session = self.client.chats.create(model=self.model)
+        self.chat_session = self.client.chats.create(model=self.model, config=self.config)
 
 if __name__ == "__main__":
     llm_client = LLMClient(model="gemini-2.5-flash")

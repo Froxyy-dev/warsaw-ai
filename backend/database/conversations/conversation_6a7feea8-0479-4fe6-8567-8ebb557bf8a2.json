@@ -1,0 +1,351 @@
+{
+  "id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+  "title": "moja dziewczyna ma pojutrze urodziny. zorganizuj p...",
+  "messages": [
+    {
+      "id": "50514977-4439-41a1-9e9a-4da014152ab7",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "moja dziewczyna ma pojutrze urodziny. zorganizuj plan na 10 osób",
+      "timestamp": "2025-11-29T16:33:55.607429",
+      "metadata": {}
+    },
+    {
+      "id": "bb6b5985-03c1-43bc-ab6d-c3798c370d0a",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "📋 PLAN IMPREZY\n\n1.  🏢 **Rezerwacja Miejsca**\n    *   Wybór lokalu: Elegancka restauracja z dobrą kuchnią, kawiarnia z wydzieloną strefą lub modny bar, który oferuje rezerwacje na większe grupy. Szukaj miejsc z miłą atmosferą i możliwością rezerwacji na 10 osób.\n    *   Kontakt: Natychmiastowa rezerwacja telefoniczna lub online na pojutrze (np. niedziela wieczór). Zapytaj o dostępność dużego stołu lub pół-prywatnej przestrzeni.\n    *   Ustalenia: Omów z obsługą możliwość wniesienia własnego tortu (upewnij się, czy nie ma dodatkowych opłat, tzw. \"korkowego\" za tort) oraz wstępne menu dla grupy lub opcje zamówień à la carte.\n\n2.  🎂 **Zamówienie Tortu**\n    *   Wybór cukierni: Skontaktuj się z lokalną, renomowaną cukiernią, która oferuje szybkie zamówienia lub ma dostępne torty \"na ostatnią chwilę\".\n    *   Rodzaj i rozmiar: Zamów tort o ulubionym smaku Twojej dziewczyny, odpowiedni dla 10 osób.\n    *   Personalizacja: Poproś o dodanie napisu \"Wszystkiego Najlepszego, [Imię Dziewczyny]!\".\n    *   Logistyka: Umów się na odbiór tortu w dniu imprezy lub jego dostawę bezpośrednio do restauracji (jeśli lokal na to pozwala).\n\n3.  🎉 **Dekoracje**\n    *   Zakup: Zestaw balonów (np. cyfry symbolizujące wiek, litery z imieniem solenizantki lub po prostu kolorowe balony lateksowe), serpentyny, konfetti. Możesz je nabyć w sklepie z artykułami imprezowymi, supermarkecie lub zamówić z ekspresową dostawą online.\n    *   Świeczki: Kup świeczki urodzinowe na tort (klasyczne, fontanny lub cyfry).\n    *   Lokalizacja: Zdecyduj, czy dekoracje zostaną rozłożone w domu przed wyjściem, czy (jeśli to możliwe i uzgodnione z obsługą) w miejscu imprezy. Ze względu na krótki termin, postaw na proste, łatwe do zaaranżowania elementy.\n\n4.  🎁 **Dodatkowe Usługi i Szczegóły**\n    *   Prezent: Finalizuj zakup prezentu dla dziewczyny.\n    *   Toast: Przygotuj krótki, serdeczny toast, który wzniesiesz w jej imieniu.\n    *   Muzyka: Stwórz spersonalizowaną playlistę z ulubionymi piosenkami solenizantki – może towarzyszyć Wam podczas przygotowań lub w drodze na imprezę.\n    *   Wspomnienia: Wyznacz jedną z osób (lub sam zajmij się tym zadaniem), aby robiła zdjęcia i kręciła krótkie filmy, by uwiecznić ten dzień.\n    *   Goście: Upewnij się, że wszyscy goście mają jasne informacje dotyczące miejsca i godziny spotkania.\n\n5.  🗓 **Harmonogram Działania (na dziś i jutro)**\n    *   **Dziś (piątek):**\n        *   PILNE: Zarezerwuj stolik/miejsce w wybranej restauracji/barze.\n        *   PILNE: Zamów tort w cukierni z odbiorem/dostawą na pojutrze.\n        *   Kup podstawowe dekoracje (balony, świeczki) – najlepiej w sklepie stacjonarnym, aby mieć je od razu.\n        *   Potwierdź obecność gości i przekaż im szczegóły.\n        *   Dopnij zakup prezentu.\n    *   **Jutro (sobota):**\n        *   Potwierdź telefonicznie wszystkie rezerwacje (restauracja, cukiernia).\n        *   Przygotuj ewentualne dekoracje do zabrania ze sobą.\n        *   Zaplanuj trasę i czas dojazdu do miejsca imprezy.\n        *   Wstępnie przećwicz toast.\n    *   **Pojutrze (niedziela - Dzień Urodzin):**\n        *   Odbierz tort (lub oczekuj na dostawę).\n        *   Ostatnie przygotowania i pakowanie rzeczy.\n        *   Zbierz gości i ruszajcie świętować!\n\n─────────────────────────\n💬 Czy chcesz coś dostosować czy potwierdzasz plan?",
+      "timestamp": "2025-11-29T16:34:14.785976",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "09a6bb09-4587-4d8b-99c7-ed22d9fd6193",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "potwierdzam",
+      "timestamp": "2025-11-29T16:34:26.230835",
+      "metadata": {}
+    },
+    {
+      "id": "7bf83bfc-737a-486e-9d11-1bf063b12c8d",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "✅ Plan zatwierdzony!\n\n📝 Teraz potrzebuję kilku danych do realizacji...\n\nŚwietnie! Cieszę się, że możemy zacząć.\n\nZacznijmy od podstawowych informacji potrzebnych do rezerwacji. Jakie jest Twoje pełne imię i nazwisko (do rezerwacji miejsca)?",
+      "timestamp": "2025-11-29T16:34:28.075441",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "e858037e-8cd5-4b7a-98a6-e900af0b8249",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "mateusz kowalski",
+      "timestamp": "2025-11-29T16:34:41.384702",
+      "metadata": {}
+    },
+    {
+      "id": "1c8ac8cc-d59c-4668-8661-27e18ec7ce7c",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Dobrze, Mateusz Kowalski. Zanotowane!\n\nTeraz potrzebuję numeru telefonu kontaktowego, który będziemy mogli podać przy rezerwacji miejsca i ewentualnie cukierni.",
+      "timestamp": "2025-11-29T16:34:42.190702",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "c368c0c9-4117-440e-8d45-5b187608110c",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "123456789",
+      "timestamp": "2025-11-29T16:34:48.669666",
+      "metadata": {}
+    },
+    {
+      "id": "09c60a1e-10fc-4017-b9a5-1f1ffeecf629",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Świetnie, numer telefonu 123456789 został zapisany.\n\nW planie mamy rezerwację na pojutrze, czyli niedzielę wieczór. Czy potwierdzasz, że impreza ma odbyć się w niedzielę, 1 grudnia 2025 roku?",
+      "timestamp": "2025-11-29T16:34:49.752832",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "915bae79-ab31-4076-882d-2c9f257aa302",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "ta",
+      "timestamp": "2025-11-29T16:34:59.081779",
+      "metadata": {}
+    },
+    {
+      "id": "64274388-828a-4cbe-be6b-ade371d8ac3c",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "OK, data 1 grudnia 2025 roku (niedziela) potwierdzona!\n\nTeraz ustalmy godzinę. Na którą godzinę wieczorem w niedzielę powinniśmy zarezerwować stolik w restauracji/barze?",
+      "timestamp": "2025-11-29T16:34:59.834866",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "9830a0bc-4b41-430f-a6d0-f2a1a0f71db0",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "17",
+      "timestamp": "2025-11-29T16:35:05.912643",
+      "metadata": {}
+    },
+    {
+      "id": "2b9ff825-a9ff-481c-95fc-d9c9e817895f",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, godzina 17:00 została zanotowana.\n\nNa koniec, potrzebuję adresu lub nazwy konkretnej lokalizacji (np. \"Restauracja Smak\", \"Kawiarnia Relaks\", \"Bar Pod Kominem\") w której planujesz zorganizować imprezę. Pomoże mi to w procesie rezerwacji i organizacji.",
+      "timestamp": "2025-11-29T16:35:06.908368",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "f92b3b99-9694-4632-8e00-ce79b8c72b53",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "restauracja smak",
+      "timestamp": "2025-11-29T16:35:23.429020",
+      "metadata": {}
+    },
+    {
+      "id": "6070174e-8e75-4efa-b400-22bef83cbdf2",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "✅ Świetnie! Mam wszystkie potrzebne dane:\n\n📋 Podsumowanie:\n• full_name: Mateusz Kowalski\n• phone: 123456789\n• date: 2025-12-01\n• time: 17:00\n• location: Restauracja Smak\n\n🎉 Plan imprezy jest gotowy do realizacji!",
+      "timestamp": "2025-11-29T16:35:24.967714",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "61b8701e-aabe-478b-b5ea-35a0e6060fdb",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Nie, to spoko. dużo, tak? Możemy robić wszystko. na",
+      "timestamp": "2025-11-29T17:33:57.541160",
+      "metadata": {}
+    },
+    {
+      "id": "52b68110-5203-497e-ac0f-1f82bc7ae384",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Nie, to spoko. Rozumiem, że wszystko jest w porządku i możemy działać.",
+      "timestamp": "2025-11-29T17:34:01.047664",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "c1875e84-0f9d-404c-8506-9eba28caab90",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Szczbrzeszynie, chrząszcz brzmi w trzcinie.",
+      "timestamp": "2025-11-29T17:35:44.908115",
+      "metadata": {}
+    },
+    {
+      "id": "31fea31e-aa83-4b74-848a-80bf39402e30",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, to jest znany polski łamaniec językowy! \"W Szczebrzeszynie chrząszcz brzmi w trzcinie i Szczebrzeszyn z tego słynie\".\n\nWracając do naszej organizacji imprezy: Czy masz już numer telefonu do Restauracji Smak, abym mógł Ci go podać, czy wolisz, żebym spróbował go dla Ciebie wyszukać, żebyśmy mogli dokonać rezerwacji?",
+      "timestamp": "2025-11-29T17:35:55.190636",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "7c3b9162-05df-4b71-a3d2-c6be922e3f90",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Jeszcze przy sinie. Krzaczek przy mnie przy sinie.",
+      "timestamp": "2025-11-29T17:38:05.884422",
+      "metadata": {}
+    },
+    {
+      "id": "a2172da1-79b2-4857-b1c5-849c85666acc",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, dziękuję za podzielenie się tymi frazami!\n\nWracając do naszej imprezy urodzinowej: Czy masz już numer telefonu do Restauracji Smak w Szczebrzeszynie, abym mógł go zanotować, czy wolisz, żebym spróbował go dla Ciebie wyszukać, abyśmy mogli dokonać rezerwacji na 1 grudnia o 17:00?",
+      "timestamp": "2025-11-29T17:38:09.749625",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "33bb7951-5fd1-4ec9-8c20-52db4263c19d",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "[ 0m0s110ms - 0m5s610ms ] Okay.",
+      "timestamp": "2025-11-29T17:43:26.736758",
+      "metadata": {}
+    },
+    {
+      "id": "4cdbec60-daee-4668-981b-7246d5a08838",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Dobrze.\n\nCzy w takim razie mogę spróbować wyszukać numer telefonu do Restauracji Smak w Szczebrzeszynie, abyśmy mogli dokonać rezerwacji?",
+      "timestamp": "2025-11-29T17:43:30.373353",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "de81e38d-0980-4d48-922d-9d91bc6ae169",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "szyszczymy sobie nowe tak, nowy. Teraz mamy sobie, że ja.",
+      "timestamp": "2025-11-29T17:48:29.681757",
+      "metadata": {}
+    },
+    {
+      "id": "33e37770-3789-43f5-8b70-2d7dbe51b6e9",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. Wygląda na to, że zmieniliśmy temat lub pojawiła się jakaś nowa kwestia.\n\nWracając do naszej rezerwacji: Czy chcesz, abym kontynuował poszukiwania restauracji w Szczebrzeszynie, czy może masz inną nazwę lub pomysł na miejsce, gdzie moglibyśmy zorganizować imprezę?",
+      "timestamp": "2025-11-29T17:48:34.934408",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "50c6432e-db70-4c0b-9dc8-5d5a4456d03f",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "transcribe this audio\nHum",
+      "timestamp": "2025-11-29T17:49:11.595664",
+      "metadata": {}
+    },
+    {
+      "id": "8a018ccf-8b4f-46f8-9f28-be905efc4682",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hum",
+      "timestamp": "2025-11-29T17:49:15.057937",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0936bf47-845c-49aa-a7fe-48981fb5b2e0",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:51:04.416267",
+      "metadata": {}
+    },
+    {
+      "id": "af5785da-4999-4f43-aa03-c205c0b2cc39",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello! How can I assist you today? I'm an AI assistant for appointment scheduling and phone calls. I can help you with:\n- Scheduling appointments\n- Checking call status\n- Managing your calendar\n- Answering questions about the system",
+      "timestamp": "2025-11-29T17:51:06.186875",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "0f28e318-f3a6-490b-addf-0c9bfbb5be30",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:52:50.192585",
+      "metadata": {}
+    },
+    {
+      "id": "167dc4eb-d7a7-48b4-8a63-1fd7944e4250",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello! How can I assist you today? I'm here to help with scheduling appointments, checking call status, managing your calendar, or answering any questions about the system.",
+      "timestamp": "2025-11-29T17:52:53.227595",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "f8eb32c7-b138-44d9-8d00-035ce1e98dd8",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-29T17:55:26.615042",
+      "metadata": {}
+    },
+    {
+      "id": "dd8ca72d-5581-42b8-972e-999e3746d941",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Hello again! How can I help you today? Please let me know if you need assistance with scheduling an appointment, checking on a call, managing your calendar, or if you have any questions about our system.",
+      "timestamp": "2025-11-29T17:55:29.894828",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "f71dedef-8068-4554-91f8-071f54b7223d",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "결국은",
+      "timestamp": "2025-11-29T17:58:08.955704",
+      "metadata": {}
+    },
+    {
+      "id": "f0ce9a21-86d5-4bf8-aa94-8667b2efdcd1",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. \"결국은\" oznacza \"w końcu\" lub \"ostatecznie\".\n\nCzy to nawiązuje do naszej poprzedniej rozmowy o rezerwacji, czy masz może jakieś nowe pytanie lub potrzebujesz pomocy z jedną z moich funkcji, takich jak umawianie wizyt, sprawdzanie statusu połączeń, zarządzanie kalendarzem lub pytania o system?",
+      "timestamp": "2025-11-29T17:58:11.807926",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "ffd22429-abfa-4451-827d-bc6fa8955e2f",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Test głosu, test głosu.",
+      "timestamp": "2025-11-29T18:06:54.333913",
+      "metadata": {}
+    },
+    {
+      "id": "ada10f60-fe82-47bc-bf0e-a1b98ede5685",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem, to był test głosu. Dziękuję.\n\nCzy mogę Ci w czymś pomóc? Na przykład, czy chcesz umówić wizytę, sprawdzić status połączenia, zarządzać kalendarzem, czy masz jakieś pytania dotyczące systemu?",
+      "timestamp": "2025-11-29T18:06:56.474607",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    },
+    {
+      "id": "462d68de-4213-47dd-999a-3ca364f112a0",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "user",
+      "content": "Ale dobry buto.\n[Organ/Keyboard sound]",
+      "timestamp": "2025-11-29T18:09:38.916794",
+      "metadata": {}
+    },
+    {
+      "id": "b1f2b114-8829-44fa-82c9-3da34a75f1e6",
+      "conversation_id": "6a7feea8-0479-4fe6-8567-8ebb557bf8a2",
+      "role": "assistant",
+      "content": "Rozumiem. Dziękuję za informację.\n\nJestem tutaj, aby pomóc Ci z:\n*   **Umawianiem wizyt**\n*   **Sprawdzaniem statusu połączeń**\n*   **Zarządzaniem terminarzem**\n*   **Odpowiadaniem na pytania o system**\n\nCzy mogę Ci pomóc w którymś z tych obszarów?",
+      "timestamp": "2025-11-29T18:09:43.377451",
+      "metadata": {
+        "model": "gemini-2.5-flash"
+      }
+    }
+  ],
+  "created_at": "2025-11-29T16:33:55.582913",
+  "updated_at": "2025-11-29T18:09:43.380221",
+  "status": "active"
+}
