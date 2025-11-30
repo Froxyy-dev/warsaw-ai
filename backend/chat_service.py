@@ -539,6 +539,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 call_id = f"call-{uuid.uuid4().hex[:8]}"
                 logger.info(f"   🆔 Generated call_id: {call_id}")
                 
+                # Determine step type for pipeline view
+                pipeline_step = "venue_calls" if "restaurant" in task.task_id else "bakery_calls"
+                logger.info(f"   📊 Pipeline step: {pipeline_step}")
+                
                 # OVERRIDE phone number for POC
                 original_phone = place.phone
                 place.phone = "+48886859039"  # HARDCODED FOR POC
@@ -566,7 +570,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         "task_id": task.task_id,
                         "place_name": place.name,
                         "place_phone": place.phone,
-                        "step": "calling",
+                        "step": pipeline_step,  # ⭐ For pipeline view: "venue_calls" or "bakery_calls"
                         "should_continue_refresh": True  # ✅ Keep refreshing - call in progress!
                     }
                 )
@@ -597,7 +601,11 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         content=f"❌ Nie udało się nawiązać połączenia z {place.name}.\n\nPróbuję kolejne miejsce...",
                         timestamp=datetime.now(),
                         metadata={
-                            "step": "call_failed",
+                            "call_id": call_id,  # ⭐ For grouping on frontend
+                            "call_stage": "failed",  # ⭐ Stage: failed to initiate
+                            "task_id": task.task_id,
+                            "place_name": place.name,
+                            "step": pipeline_step,  # ⭐ For pipeline view
                             "should_continue_refresh": True  # ✅ Trying next place!
                         }
                     )
@@ -673,7 +681,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                             "call_stage": "transcript",  # ⭐ Stage: transcript
                             "task_id": task.task_id,
                             "place_name": place.name,
-                            "step": "transcript",
+                            "step": pipeline_step,  # ⭐ For pipeline view: "venue_calls" or "bakery_calls"
                             "conversation_id": eleven_conversation_id,
                             "should_continue_refresh": True  # ✅ Keep refreshing - analysis coming!
                         }
@@ -689,7 +697,11 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         content=f"❌ Błąd podczas formatowania transkryptu z {place.name}.\n\nStatus rozmowy: {conversation_data.get('status', 'unknown')}\nSprawdź logi backendu dla szczegółów.",
                         timestamp=datetime.now(),
                         metadata={
-                            "step": "transcript_format_error",
+                            "call_id": call_id,  # ⭐ For grouping on frontend
+                            "call_stage": "error",  # ⭐ Stage: error
+                            "task_id": task.task_id,
+                            "place_name": place.name,
+                            "step": pipeline_step,  # ⭐ For pipeline view
                             "should_continue_refresh": True  # ✅ Keep refreshing - trying next place!
                         }
                     )
@@ -744,7 +756,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                             "call_success": True,  # ⭐ Success!
                             "task_id": task.task_id,
                             "place_name": place.name,
-                            "step": "analysis",
+                            "step": pipeline_step,  # ⭐ For pipeline view: "venue_calls" or "bakery_calls"
                             "analysis": analysis,
                             "should_continue_refresh": True  # ✅ More tasks coming!
                         }
@@ -777,7 +789,7 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                             "call_success": False,  # ⭐ Failed!
                             "task_id": task.task_id,
                             "place_name": place.name,
-                            "step": "analysis_retry",
+                            "step": pipeline_step,  # ⭐ For pipeline view: "venue_calls" or "bakery_calls"
                             "analysis": analysis,
                             "should_continue_refresh": True  # ✅ Trying next place!
                         }

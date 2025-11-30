@@ -85,8 +85,8 @@ export function PipelineView({ messages }: PipelineViewProps) {
     );
     
     const hasBakeryCalls = messages.some(m => 
-      m.content.toLowerCase().includes('bakery') && 
-      m.content.toLowerCase().includes('call')
+      (m.content.toLowerCase().includes('bakery') && m.content.toLowerCase().includes('call')) ||
+      m.metadata?.step === 'bakery_calls'
     );
     
     const hasResults = messages.some(m => 
