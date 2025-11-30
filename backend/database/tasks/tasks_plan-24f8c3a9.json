@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-24f8c3a9",
+  "conversation_id": "",
+  "created_at": "2025-11-30T10:16:01.375401",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-46f8c718",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2 grudnia 2025\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Flaming & Co.",
+          "phone": "+48 724 234 234"
+        },
+        {
+          "name": "Alewino",
+          "phone": "+48 22 628 38 30"
+        },
+        {
+          "name": "Strefa Restauracja & Bar",
+          "phone": "+48 22 255 08 50"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-1858931e",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Napis na torcie: \"Wszystkiego najlepszego Ada\"\n- Data odbioru: 2 grudnia 2025\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "DESEO Patisserie & Chocolaterie",
+          "phone": "+48 22 617 63 04"
+        },
+        {
+          "name": "Cukiernia Lukullus",
+          "phone": "+48 726 262 608"
+        },
+        {
+          "name": "Słodki Słony (Magda Gessler)",
+          "phone": "+48 22 622 49 34"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

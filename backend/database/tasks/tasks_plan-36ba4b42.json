@@ -1,0 +1,44 @@
+{
+  "plan_id": "plan-36ba4b42",
+  "conversation_id": "",
+  "created_at": "2025-11-30T10:08:44.643101",
+  "tasks": [
+    {
+      "task_id": "party-restaurant-dfcbbf15",
+      "notes_for_agent": "Dzwonisz do lokalu/restauracji aby zarezerwować miejsce na imprezę urodzinową.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły rezerwacji:\n- Data: 2 grudnia\n- Godzina rozpoczęcia: 16:00\n- Czas trwania: około 5 godzin\n- Liczba osób: około 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje: proste dekoracje urodzinowe\n\nJeśli ten lokal nie ma wolnych miejsc, spróbuj kolejny z listy. Na koniec potwierdź wszystkie szczegóły rezerwacji.",
+      "places": [
+        {
+          "name": "Restauracja Stary Dom",
+          "phone": "+48 22 646 42 08"
+        },
+        {
+          "name": "Restauracja AleGloria Magda Gessler",
+          "phone": "+48 539 535 178"
+        },
+        {
+          "name": "Flaming & Co.",
+          "phone": "+48 512 377 853"
+        }
+      ]
+    },
+    {
+      "task_id": "party-bakery-fa40d50e",
+      "notes_for_agent": "Dzwonisz do cukierni aby zamówić tort urodzinowy.\nDane kontaktowe organizatora: Mateusz Winiarek, tel: 886859039.\n\nSzczegóły zamówienia:\n- Tort urodzinowy\n- Data odbioru: 2 grudnia\n\nJeśli ta cukiernia nie może zrealizować zamówienia, spróbuj kolejną z listy. Zapytaj o cenę i czy tort będzie gotowy na podany dzień. Potwierdź wszystkie szczegóły zamówienia.",
+      "places": [
+        {
+          "name": "MajCake Pracownia Tortów i Słodkości",
+          "phone": "+48 660 484 463"
+        },
+        {
+          "name": "Cukiernia Sweet Home",
+          "phone": "+48 668 048 031"
+        },
+        {
+          "name": "Cukiernia AleTort",
+          "phone": "+48 516 163 163"
+        }
+      ]
+    }
+  ],
+  "status": "pending"
+}

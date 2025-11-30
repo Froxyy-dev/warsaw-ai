@@ -265,9 +265,14 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         # Frontend will auto-refresh to see new messages as they appear
         if state_before == PlanState.GATHERING and self.party_planner.state == PlanState.SEARCHING:
             response_already_saved = True  # We'll save messages directly, don't return response
-            logger.info("🔍 Gathering complete, executing search flow step by step...")
+            logger.info("🔍 Gathering complete, starting search flow IN BACKGROUND...")
             
-            # ✅ PROGRESS MESSAGE #0: Let user know we're starting
+            # ✅ RUN SEARCH + TASK GENERATION IN BACKGROUND (don't block request!)
+            import asyncio
+            asyncio.create_task(self._execute_search_and_tasks_in_background(conversation_id))
+            logger.info("✅ Search flow started in background - request can return now!")
+            
+            # Just send initial message, background task will handle the rest
             progress_msg = Message(
                 id=str(uuid.uuid4()),
                 conversation_id=conversation_id,
@@ -281,104 +286,6 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             )
             storage_manager.add_message_to_conversation(conversation_id, progress_msg)
             logger.info("✅ Progress message saved - user can see we're starting")
-            
-            # Step 1: Venue search (with error handling)
-            logger.info("🏢 Step 1: Searching venues...")
-            try:
-                venue_response = await self.party_planner.search_venues_only()
-            except Exception as e:
-                logger.error(f"❌ Venue search failed: {e}", exc_info=True)
-                venue_response = f"❌ Nie udało się wyszukać lokali (błąd: {str(e)})\n\nKontynuuję wyszukiwanie cukierni..."
-            
-            venue_msg = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.ASSISTANT,
-                content=venue_response,
-                timestamp=datetime.now(),
-                metadata={
-                    "step": "venue_search",
-                    "should_continue_refresh": True  # ✅ Keep refreshing - bakery search coming!
-                }
-            )
-            storage_manager.add_message_to_conversation(conversation_id, venue_msg)
-            logger.info("✅ Venue search message saved (frontend can now see it)")
-            
-            # Step 2: Bakery search (with error handling)
-            logger.info("🍰 Step 2: Searching bakeries...")
-            try:
-                bakery_response = await self.party_planner.search_bakeries_only()
-            except Exception as e:
-                logger.error(f"❌ Bakery search failed: {e}", exc_info=True)
-                bakery_response = f"❌ Nie udało się wyszukać cukierni (błąd: {str(e)})\n\nKontynuuję generowanie zadań..."
-            
-            bakery_msg = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.ASSISTANT,
-                content=bakery_response,
-                timestamp=datetime.now(),
-                metadata={
-                    "step": "bakery_search",
-                    "should_continue_refresh": True  # ✅ Keep refreshing - task generation coming!
-                }
-            )
-            storage_manager.add_message_to_conversation(conversation_id, bakery_msg)
-            logger.info("✅ Bakery search message saved (frontend can now see it)")
-            
-            # Step 3: Task generation (with error handling)
-            logger.info("📋 Step 3: Generating tasks...")
-            try:
-                task_response = await self.party_planner.generate_and_save_tasks()
-            except Exception as e:
-                logger.error(f"❌ Task generation failed: {e}", exc_info=True)
-                task_response = f"❌ Nie udało się wygenerować zadań (błąd: {str(e)})\n\nSpróbuj ponownie lub skontaktuj się z supportem."
-            
-            task_msg = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.ASSISTANT,
-                content=task_response,
-                timestamp=datetime.now(),
-                metadata={
-                    "step": "task_generation",
-                    "should_continue_refresh": True  # ✅ KEEP refreshing - voice calls coming!
-                }
-            )
-            storage_manager.add_message_to_conversation(conversation_id, task_msg)
-            logger.info("✅ Task generation message saved")
-            logger.info("🎉 All 3 messages saved! Voice agent execution will follow...")
-            
-            # ⭐ Check if we transitioned to EXECUTING (party_planner changed state)
-            if self.party_planner.state == PlanState.EXECUTING:
-                logger.info("📞 Starting voice agent execution IN BACKGROUND...")
-                plan_id = self.party_planner.gathered_info.get("plan_id")
-                
-                if plan_id:
-                    # ✅ Tell frontend to keep auto-refreshing - voice calls starting!
-                    voice_starting_msg = Message(
-                        id=str(uuid.uuid4()),
-                        conversation_id=conversation_id,
-                        role=MessageRole.ASSISTANT,
-                        content="🎙️ **Zaczynam wykonywać połączenia głosowe...**\n\nAgent głosowy dzwoni do wybranych miejsc. Sprawdzaj aktualizacje poniżej!",
-                        timestamp=datetime.now(),
-                        metadata={
-                            "step": "voice_agent_starting",
-                            "should_continue_refresh": True  # ✅ KEEP REFRESHING!
-                        }
-                    )
-                    storage_manager.add_message_to_conversation(conversation_id, voice_starting_msg)
-                    logger.info("✅ Voice starting message saved with should_continue_refresh=True")
-                    
-                    # ✅ RUN IN BACKGROUND - don't await! Return immediately!
-                    import asyncio
-                    asyncio.create_task(self._execute_voice_agent_in_background(conversation_id, plan_id))
-                    logger.info("✅ Voice agent started in background - request can return now!")
-                    
-                    # After execution, mark as complete
-                    self.party_planner.state = PlanState.COMPLETE
-                else:
-                    logger.error("No plan_id found in gathered_info!")
         
         # Update plan
         plan.current_plan = self.party_planner.current_plan
@@ -397,6 +304,119 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             return ""
         
         return response
+    
+    async def _execute_search_and_tasks_in_background(
+        self,
+        conversation_id: str
+    ) -> None:
+        """
+        Execute venue search, bakery search, and task generation in background
+        This prevents blocking the request handler for 30-60 seconds
+        """
+        try:
+            logger.info("🔄 Background task: Starting venue search...")
+            
+            # Step 1: Venue search
+            try:
+                venue_response = await self.party_planner.search_venues_only()
+            except Exception as e:
+                logger.error(f"❌ Venue search failed: {e}", exc_info=True)
+                venue_response = f"❌ Nie udało się wyszukać lokali (błąd: {str(e)})\n\nKontynuuję wyszukiwanie cukierni..."
+            
+            venue_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=venue_response,
+                timestamp=datetime.now(),
+                metadata={
+                    "step": "venue_search",
+                    "should_continue_refresh": True
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, venue_msg)
+            logger.info("✅ Venue search message saved")
+            
+            # Step 2: Bakery search
+            logger.info("🔄 Background task: Starting bakery search...")
+            try:
+                bakery_response = await self.party_planner.search_bakeries_only()
+            except Exception as e:
+                logger.error(f"❌ Bakery search failed: {e}", exc_info=True)
+                bakery_response = f"❌ Nie udało się wyszukać cukierni (błąd: {str(e)})\n\nKontynuuję generowanie zadań..."
+            
+            bakery_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=bakery_response,
+                timestamp=datetime.now(),
+                metadata={
+                    "step": "bakery_search",
+                    "should_continue_refresh": True
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, bakery_msg)
+            logger.info("✅ Bakery search message saved")
+            
+            # Step 3: Task generation
+            logger.info("🔄 Background task: Generating tasks...")
+            try:
+                task_response = await self.party_planner.generate_and_save_tasks()
+            except Exception as e:
+                logger.error(f"❌ Task generation failed: {e}", exc_info=True)
+                task_response = f"❌ Nie udało się wygenerować zadań (błąd: {str(e)})"
+            
+            if task_response and task_response.strip():
+                task_msg = Message(
+                    id=str(uuid.uuid4()),
+                    conversation_id=conversation_id,
+                    role=MessageRole.ASSISTANT,
+                    content=task_response,
+                    timestamp=datetime.now(),
+                    metadata={
+                        "step": "task_generation",
+                        "should_continue_refresh": True
+                    }
+                )
+                storage_manager.add_message_to_conversation(conversation_id, task_msg)
+                logger.info("✅ Task generation message saved")
+            
+            # Step 4: Start voice agent if tasks were generated
+            if self.party_planner.state == PlanState.EXECUTING:
+                plan_id = self.party_planner.gathered_info.get("plan_id")
+                if plan_id:
+                    voice_starting_msg = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content="🎙️ **Zaczynam wykonywać połączenia głosowe...**\n\nAgent głosowy dzwoni do wybranych miejsc. Sprawdzaj aktualizacje poniżej!",
+                        timestamp=datetime.now(),
+                        metadata={
+                            "step": "voice_agent_starting",
+                            "should_continue_refresh": True
+                        }
+                    )
+                    storage_manager.add_message_to_conversation(conversation_id, voice_starting_msg)
+                    
+                    # Execute voice agent
+                    await self._execute_voice_agent_in_background(conversation_id, plan_id)
+            
+        except Exception as e:
+            logger.error(f"❌ Search and tasks background task failed: {e}", exc_info=True)
+            error_msg = Message(
+                id=str(uuid.uuid4()),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content=f"❌ Wystąpił błąd podczas wyszukiwania: {str(e)}",
+                timestamp=datetime.now(),
+                metadata={
+                    "step": "error",
+                    "error": True,
+                    "should_continue_refresh": False
+                }
+            )
+            storage_manager.add_message_to_conversation(conversation_id, error_msg)
     
     async def _execute_voice_agent_in_background(
         self,
