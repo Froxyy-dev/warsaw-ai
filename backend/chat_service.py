@@ -146,19 +146,25 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     )
                     logger.info(f"   ✅ Chat response generated, length: {len(ai_content)}")
                 
-                # Create assistant message
+                # Create assistant message (unless content is empty - meaning messages were already saved)
                 # ✅ Backend tells frontend whether to continue auto-refresh
-                assistant_message = Message(
-                    id=str(uuid.uuid4()),
-                    conversation_id=conversation_id,
-                    role=MessageRole.ASSISTANT,
-                    content=ai_content,
-                    timestamp=datetime.now(),
-                    metadata={
-                        "model": "gemini-2.5-flash",
-                        "should_continue_refresh": False  # By default, stop and wait for user
-                    }
-                )
+                if ai_content.strip():
+                    assistant_message = Message(
+                        id=str(uuid.uuid4()),
+                        conversation_id=conversation_id,
+                        role=MessageRole.ASSISTANT,
+                        content=ai_content,
+                        timestamp=datetime.now(),
+                        metadata={
+                            "model": "gemini-2.5-flash",
+                            "should_continue_refresh": False  # By default, stop and wait for user
+                        }
+                    )
+                else:
+                    # Empty response means messages were already saved directly
+                    # Return None to indicate no new message should be added
+                    logger.info("⚠️ Empty ai_content - messages were already saved directly")
+                    assistant_message = None
                 
                 logger.info(f"Processed message for conversation {conversation_id}")
                 return user_message, assistant_message
@@ -252,9 +258,13 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         logger.info(f"   State after: {self.party_planner.state}")
         logger.info(f"   Response length: {len(response)}")
         
+        # Track whether we handled the response ourselves
+        response_already_saved = False
+        
         # Check if we JUST TRANSITIONED to SEARCHING (gathering just completed)
         # Frontend will auto-refresh to see new messages as they appear
         if state_before == PlanState.GATHERING and self.party_planner.state == PlanState.SEARCHING:
+            response_already_saved = True  # We'll save messages directly, don't return response
             logger.info("🔍 Gathering complete, executing search flow step by step...")
             
             # ✅ PROGRESS MESSAGE #0: Let user know we're starting
@@ -379,6 +389,12 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
         
         storage_manager.save_plan(plan)
         logger.info(f"Updated plan {plan.id}, new state: {plan.state}")
+        
+        # If we already saved messages directly (e.g., during GATHERING->SEARCHING transition),
+        # return empty string to avoid duplicate message with wrong metadata
+        if response_already_saved:
+            logger.info("⚠️ Response already saved directly, returning empty string to avoid duplicate")
+            return ""
         
         return response
     
@@ -522,7 +538,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         "task_id": task.task_id,
                         "place_name": place.name,
                         "place_phone": place.phone,
-                        "step": "calling"
+                        "step": "calling",
+                        "should_continue_refresh": True  # ✅ Keep refreshing - call in progress!
                     }
                 )
                 logger.info(f"   💾 Saving 'calling' message...")
@@ -583,7 +600,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         role=MessageRole.ASSISTANT,
                         content=f"❌ Nie udało się pobrać transkryptu rozmowy z {place.name}.\n\nPróbuję kolejne miejsce...",
                         timestamp=datetime.now(),
-                        metadata={"step": "transcript_failed"}
+                        metadata={
+                            "step": "transcript_failed",
+                            "should_continue_refresh": True  # ✅ Keep refreshing - trying next place!
+                        }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, error_msg)
                     place.phone = original_phone  # Restore
@@ -624,7 +644,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                             "task_id": task.task_id,
                             "place_name": place.name,
                             "step": "transcript",
-                            "conversation_id": eleven_conversation_id
+                            "conversation_id": eleven_conversation_id,
+                            "should_continue_refresh": True  # ✅ Keep refreshing - analysis coming!
                         }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, transcript_msg)
@@ -637,7 +658,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         role=MessageRole.ASSISTANT,
                         content=f"❌ Błąd podczas formatowania transkryptu z {place.name}.\n\nStatus rozmowy: {conversation_data.get('status', 'unknown')}\nSprawdź logi backendu dla szczegółów.",
                         timestamp=datetime.now(),
-                        metadata={"step": "transcript_format_error"}
+                        metadata={
+                            "step": "transcript_format_error",
+                            "should_continue_refresh": True  # ✅ Keep refreshing - trying next place!
+                        }
                     )
                     storage_manager.add_message_to_conversation(conversation_id, error_msg)
                     place.phone = original_phone  # Restore

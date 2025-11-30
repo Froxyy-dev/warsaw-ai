@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SendHorizontal, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChatMessage } from '@/components/ChatMessage';
 
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -106,12 +107,11 @@ export function ChatWindow() {
               console.log('📨 Backend says: CONTINUE auto-refresh (more messages coming)');
               console.log('   Step:', metadata.step || 'unknown');
             } else {
-              // Fallback if flag not set - assume we should stop
-              console.log('⚠️ No should_continue_refresh flag - assuming STOP');
-              setIsLoading(false);
-              setIsSearching(false);
-              clearInterval(intervalId);
-              return;
+              // Fallback if flag not set - assume we should CONTINUE
+              // (backend might not always set this flag, especially during processing)
+              console.log('⚠️ No should_continue_refresh flag - assuming CONTINUE (backend still processing)');
+              console.log('   Message preview:', lastMessage.content.substring(0, 100));
+              // Keep refreshing
             }
           }
         } else {
@@ -287,14 +287,6 @@ export function ChatWindow() {
     }
   };
 
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
-
   return (
     <div className="flex flex-col h-full">
       {/* Messages Container */}
@@ -312,39 +304,15 @@ export function ChatWindow() {
         ) : (
           <>
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex w-full",
-                  message.role === 'user' ? "justify-end" : "justify-start"
-                )}
-              >
-                <div
-                  className={cn(
-                    "max-w-[75%] rounded-2xl px-4 py-3 shadow-lg",
-                    message.role === 'user'
-                      ? "bg-blue-600 text-white rounded-br-sm"
-                      : "bg-slate-800 text-slate-100 rounded-bl-sm border border-slate-700"
-                  )}
-                >
-                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                  </div>
-                  <div
-                    className={cn(
-                      "text-xs mt-2 opacity-60",
-                      message.role === 'user' ? "text-right" : "text-left"
-                    )}
-                  >
-                    {formatTimestamp(message.timestamp)}
-                  </div>
-                </div>
-              </div>
+              <ChatMessage key={message.id} message={message} />
             ))}
 
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[75%] rounded-2xl rounded-bl-sm px-4 py-3 bg-slate-800 border border-slate-700">
+              <div className="flex justify-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                  AI
+                </div>
+                <div className="max-w-[75%] rounded-2xl rounded-bl-sm px-4 py-3 bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-blue-400" />

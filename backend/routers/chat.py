@@ -152,8 +152,11 @@ async def send_message(
                 message_request.content
             )
             logger.info(f"✅ AI processing complete!")
-            logger.info(f"   Assistant message ID: {assistant_message.id}")
-            logger.info(f"   Assistant message preview: {assistant_message.content[:50]}...")
+            if assistant_message:
+                logger.info(f"   Assistant message ID: {assistant_message.id}")
+                logger.info(f"   Assistant message preview: {assistant_message.content[:50]}...")
+            else:
+                logger.info(f"   ⚠️ No assistant message (messages already saved directly)")
         except Exception as ai_error:
             logger.error(f"❌ AI processing failed: {ai_error}", exc_info=True)
             
@@ -175,20 +178,33 @@ async def send_message(
             # Return error message instead of crashing
             assistant_message = error_message
         
-        # Save assistant message
-        logger.info(f"💾 Saving assistant message...")
-        success = storage_manager.add_message_to_conversation(
-            conversation_id,
-            assistant_message
-        )
-        if not success:
-            logger.error(f"❌ Failed to save assistant message!")
-            raise HTTPException(status_code=500, detail="Failed to save assistant message")
-        logger.info(f"✅ Assistant message saved to conversation {conversation_id}")
-        
-        # Return assistant message
-        logger.info(f"📤 Returning assistant message")
-        return assistant_message
+        # Save assistant message (if one was created)
+        if assistant_message:
+            logger.info(f"💾 Saving assistant message...")
+            success = storage_manager.add_message_to_conversation(
+                conversation_id,
+                assistant_message
+            )
+            if not success:
+                logger.error(f"❌ Failed to save assistant message!")
+                raise HTTPException(status_code=500, detail="Failed to save assistant message")
+            logger.info(f"✅ Assistant message saved to conversation {conversation_id}")
+            
+            # Return assistant message
+            logger.info(f"📤 Returning assistant message")
+            return assistant_message
+        else:
+            # Messages were already saved directly (e.g., during GATHERING->SEARCHING transition)
+            # Return a dummy message for the API response (frontend won't see this, it polls for updates)
+            logger.info(f"📤 No assistant message to return (messages saved directly)")
+            return Message(
+                id="processing",
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content="Processing...",
+                timestamp=datetime.utcnow(),
+                metadata={"should_continue_refresh": True}
+            )
         
     except HTTPException:
         raise
