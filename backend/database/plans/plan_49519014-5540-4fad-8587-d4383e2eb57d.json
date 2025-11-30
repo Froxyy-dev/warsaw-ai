@@ -1,8 +1,8 @@
 {
-  "id": "ea565d4f-c4bc-48d0-a4e9-c1730f18b2e6",
-  "conversation_id": "e3ab48f8-3a3e-4e25-8a94-f66786e8bec5",
+  "id": "49519014-5540-4fad-8587-d4383e2eb57d",
+  "conversation_id": "13a1de0a-4ec1-4f03-9587-ddb591f8c497",
   "user_request": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
-  "current_plan": "Oto zaktualizowany plan:\n\nZadzwonić do restauracji/lokalu z salami z następującymi instrukcjami:\n- Rezerwacja: 1 grudnia, 16:00, 5 godzin.\n- Liczba osób: 10.\n- Dekoracje urodzinowe.\n- Menu: tradycyjna kuchnia polska.\n\nZadzwonić do profesjonalnej cukierni z następującymi instrukcjami:\n- Zamówić tort urodzinowy.\n- Napis na torcie: \"Wszystkiego najlepszego Ada\".\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+  "current_plan": "Oto zaktualizowany plan:\n\nZadzwonić do lokalu w Warszawie z następującymi instrukcjami:\n- Rezerwacja: 2 grudnia, 16:00, na 5h\n- Liczba osób: 10\n- Menu: tradycyjna kuchnia polska\n- Dekoracje urodzinowe\n\nZadzwonić do cukierni z następującymi instrukcjami:\n- Zamówić tort: wszystkiego najlepszego Ada\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
   "plan_items": [],
   "state": "searching",
   "gathered_info": {
@@ -17,6 +17,6 @@
   "feedback_history": [
     "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska."
   ],
-  "created_at": "2025-11-30T10:29:44.141336",
-  "updated_at": "2025-11-30T10:30:26.242446"
+  "created_at": "2025-11-30T10:46:09.938947",
+  "updated_at": "2025-11-30T10:46:50.113287"
 }

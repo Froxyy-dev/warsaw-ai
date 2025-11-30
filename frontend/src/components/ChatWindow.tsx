@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SendHorizontal, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/components/ChatMessage';
+import { CallGroup } from '@/components/CallGroup';
 
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -287,6 +288,54 @@ export function ChatWindow() {
     }
   };
 
+  // Group messages by call_id for CallGroup rendering
+  const groupMessages = () => {
+    const grouped: Array<{ type: 'call' | 'message', data: Message | Message[], key: string }> = [];
+    const callGroups = new Map<string, Message[]>();
+    const processedIndices = new Set<number>();
+
+    // First pass: collect all messages with call_id
+    messages.forEach((msg, idx) => {
+      const callId = msg.metadata?.call_id;
+      if (callId) {
+        if (!callGroups.has(callId)) {
+          callGroups.set(callId, []);
+        }
+        callGroups.get(callId)!.push(msg);
+        processedIndices.add(idx);
+      }
+    });
+
+    // Second pass: build final array in original order
+    messages.forEach((msg, idx) => {
+      if (processedIndices.has(idx)) {
+        const callId = msg.metadata?.call_id;
+        if (callId && callGroups.has(callId)) {
+          // Only add the group once (when we hit the first message of the group)
+          const group = callGroups.get(callId)!;
+          if (group[0].id === msg.id) {
+            grouped.push({
+              type: 'call',
+              data: group,
+              key: callId
+            });
+          }
+        }
+      } else {
+        // Regular message
+        grouped.push({
+          type: 'message',
+          data: msg,
+          key: msg.id
+        });
+      }
+    });
+
+    return grouped;
+  };
+
+  const groupedMessages = groupMessages();
+
   return (
     <div className="flex flex-col h-full">
       {/* Messages Container */}
@@ -303,9 +352,22 @@ export function ChatWindow() {
           </div>
         ) : (
           <>
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
+            {groupedMessages.map((item) => {
+              if (item.type === 'call') {
+                const callMessages = item.data as Message[];
+                const latestTimestamp = callMessages[callMessages.length - 1].timestamp;
+                return (
+                  <CallGroup 
+                    key={item.key} 
+                    messages={callMessages} 
+                    timestamp={latestTimestamp}
+                  />
+                );
+              } else {
+                const message = item.data as Message;
+                return <ChatMessage key={item.key} message={message} />;
+              }
+            })}
 
             {isLoading && (
               <div className="flex justify-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">

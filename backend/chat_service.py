@@ -535,6 +535,10 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                 logger.info("└" + "─"*68 + "┘")
                 logger.info(f"   Original phone: {place.phone}")
                 
+                # Generate unique call_id for grouping messages on frontend
+                call_id = f"call-{uuid.uuid4().hex[:8]}"
+                logger.info(f"   🆔 Generated call_id: {call_id}")
+                
                 # OVERRIDE phone number for POC
                 original_phone = place.phone
                 place.phone = "+48886859039"  # HARDCODED FOR POC
@@ -557,6 +561,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                     content=calling_msg_content,
                     timestamp=datetime.now(),
                     metadata={
+                        "call_id": call_id,  # ⭐ For grouping on frontend
+                        "call_stage": "initiated",  # ⭐ Stage: initiated
                         "task_id": task.task_id,
                         "place_name": place.name,
                         "place_phone": place.phone,
@@ -663,6 +669,8 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
                         content=f"📞 **Zakończono rozmowę z {place.name}**\n\n{transcript}",
                         timestamp=datetime.now(),
                         metadata={
+                            "call_id": call_id,  # ⭐ For grouping on frontend
+                            "call_stage": "transcript",  # ⭐ Stage: transcript
                             "task_id": task.task_id,
                             "place_name": place.name,
                             "step": "transcript",
@@ -731,7 +739,11 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
 🎉 Przechodzę do następnego zadania...""",
                         timestamp=datetime.now(),
                         metadata={
+                            "call_id": call_id,  # ⭐ For grouping on frontend
+                            "call_stage": "completed",  # ⭐ Stage: completed
+                            "call_success": True,  # ⭐ Success!
                             "task_id": task.task_id,
+                            "place_name": place.name,
                             "step": "analysis",
                             "analysis": analysis,
                             "should_continue_refresh": True  # ✅ More tasks coming!
@@ -760,7 +772,11 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
 ⏭️ {next_action}""",
                         timestamp=datetime.now(),
                         metadata={
+                            "call_id": call_id,  # ⭐ For grouping on frontend
+                            "call_stage": "completed",  # ⭐ Stage: completed
+                            "call_success": False,  # ⭐ Failed!
                             "task_id": task.task_id,
+                            "place_name": place.name,
                             "step": "analysis_retry",
                             "analysis": analysis,
                             "should_continue_refresh": True  # ✅ Trying next place!
