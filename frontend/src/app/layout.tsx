@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Chat Assistant",
-  description: "Modern AI-powered chat assistant for planning and organization",
+  title: "AI Event Planner",
+  description: "Your intelligent event planning companion - plan events, find venues, and coordinate everything with AI",
 };
 
 export default function RootLayout({

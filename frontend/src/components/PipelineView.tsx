@@ -182,41 +182,41 @@ export function PipelineView({ messages }: PipelineViewProps) {
   const getStatusIcon = (status: PipelineStep['status']) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle2 className="w-5 h-5 text-green-400" />;
+        return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
       case 'in_progress':
-        return <Clock className="w-5 h-5 text-blue-400 animate-pulse" />;
+        return <Clock className="w-5 h-5 text-neutral-400 animate-pulse" />;
       case 'skipped':
-        return <XCircle className="w-5 h-5 text-slate-500" />;
+        return <XCircle className="w-5 h-5 text-neutral-700" />;
       default:
-        return <Circle className="w-5 h-5 text-slate-600" />;
+        return <Circle className="w-5 h-5 text-neutral-800" />;
     }
   };
 
   const getStatusBadge = (status: TaskResult['status']) => {
     switch (status) {
       case 'success':
-        return <Badge className="bg-green-600 hover:bg-green-700">Booked</Badge>;
+        return <Badge className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30">Booked</Badge>;
       case 'no_answer':
-        return <Badge variant="secondary">No Answer</Badge>;
+        return <Badge className="bg-neutral-800/50 hover:bg-neutral-800 text-neutral-400 border-white/[0.06]">No Answer</Badge>;
       case 'rejected':
-        return <Badge variant="destructive">Rejected</Badge>;
+        return <Badge className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30">Rejected</Badge>;
       default:
-        return <Badge variant="outline">Pending</Badge>;
+        return <Badge className="bg-neutral-900/50 border-white/[0.06] text-neutral-500">Pending</Badge>;
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Pipeline Steps */}
-      <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
+      <Card className="bg-[#1a1a1a] border-white/[0.06] rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <ClipboardList className="w-4 h-4 text-white" />
+          <CardTitle className="text-lg flex items-center gap-2 text-neutral-100">
+            <div className="w-8 h-8 rounded-lg bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center">
+              <ClipboardList className="w-4 h-4 text-neutral-400" />
             </div>
             Event Planning Pipeline
           </CardTitle>
-          <CardDescription>Track your event planning progress</CardDescription>
+          <CardDescription className="text-neutral-500">Track your event planning progress</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -227,7 +227,7 @@ export function PipelineView({ messages }: PipelineViewProps) {
                   <div 
                     className={cn(
                       "absolute left-[10px] top-9 w-[2px] h-[calc(100%+4px)]",
-                      step.status === 'completed' ? "bg-green-400/30" : "bg-slate-700/50"
+                      step.status === 'completed' ? "bg-emerald-500/20" : "bg-neutral-800/50"
                     )} 
                   />
                 )}
@@ -236,8 +236,8 @@ export function PipelineView({ messages }: PipelineViewProps) {
                 <div
                   className={cn(
                     "flex gap-3 p-3 rounded-lg transition-all",
-                    step.status === 'in_progress' && "bg-blue-500/10 border border-blue-500/20",
-                    step.status === 'completed' && "opacity-70 hover:opacity-100"
+                    step.status === 'in_progress' && "bg-neutral-800/30 border border-neutral-700/50",
+                    step.status === 'completed' && "opacity-60 hover:opacity-100"
                   )}
                 >
                   {/* Status icon */}
@@ -253,18 +253,18 @@ export function PipelineView({ messages }: PipelineViewProps) {
                       </div>
                       <h3 className={cn(
                         "text-sm font-semibold",
-                        step.status === 'completed' && "text-slate-300",
-                        step.status === 'in_progress' && "text-blue-300",
-                        step.status === 'pending' && "text-slate-500"
+                        step.status === 'completed' && "text-neutral-300",
+                        step.status === 'in_progress' && "text-neutral-200",
+                        step.status === 'pending' && "text-neutral-600"
                       )}>
                         {step.title}
                       </h3>
                     </div>
                     <p className={cn(
                       "text-xs mt-1",
-                      step.status === 'completed' && "text-slate-400",
-                      step.status === 'in_progress' && "text-blue-400/80",
-                      step.status === 'pending' && "text-slate-600"
+                      step.status === 'completed' && "text-neutral-500",
+                      step.status === 'in_progress' && "text-neutral-400",
+                      step.status === 'pending' && "text-neutral-700"
                     )}>
                       {step.description}
                     </p>
@@ -278,15 +278,15 @@ export function PipelineView({ messages }: PipelineViewProps) {
 
       {/* Task Results */}
       {results.length > 0 && (
-        <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
+        <Card className="bg-[#1a1a1a] border-white/[0.06] rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-white" />
+            <CardTitle className="text-lg flex items-center gap-2 text-neutral-100">
+              <div className="w-8 h-8 rounded-lg bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center">
+                <FileText className="w-4 h-4 text-neutral-400" />
               </div>
               Results & Tasks
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-neutral-500">
               {results.length} {results.length === 1 ? 'result' : 'results'} from venue and bakery contacts
             </CardDescription>
           </CardHeader>
@@ -295,20 +295,20 @@ export function PipelineView({ messages }: PipelineViewProps) {
               {results.map((result) => (
                 <div
                   key={result.id}
-                  className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all"
+                  className="p-4 rounded-xl bg-[#0a0a0a] border border-white/[0.06] hover:border-white/[0.1] transition-all"
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center">
                         {result.type === 'venue' ? (
-                          <MapPin className="w-5 h-5 text-blue-400" />
+                          <MapPin className="w-5 h-5 text-neutral-400" />
                         ) : (
-                          <Cake className="w-5 h-5 text-pink-400" />
+                          <Cake className="w-5 h-5 text-neutral-400" />
                         )}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{result.placeName}</h4>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <h4 className="font-semibold text-neutral-200 text-sm">{result.placeName}</h4>
+                        <p className="text-xs text-neutral-500 mt-0.5">
                           {result.type === 'venue' ? 'Venue' : 'Bakery'}
                         </p>
                       </div>
@@ -319,17 +319,17 @@ export function PipelineView({ messages }: PipelineViewProps) {
                   {result.details && (
                     <div className="space-y-1 mb-3">
                       {result.date && (
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-neutral-400">
                           📅 {result.date} {result.time && `at ${result.time}`}
                         </div>
                       )}
                       {result.people && (
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-neutral-400">
                           👥 {result.people} people
                         </div>
                       )}
                       {result.price && (
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-neutral-400">
                           💰 {result.price}
                         </div>
                       )}
@@ -339,7 +339,7 @@ export function PipelineView({ messages }: PipelineViewProps) {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full text-xs h-8 bg-slate-800 hover:bg-slate-700 border-slate-700"
+                    className="w-full text-xs h-8 bg-[#2a2a2a] hover:bg-[#333333] border-white/[0.08] text-neutral-400"
                   >
                     View Transcript
                   </Button>

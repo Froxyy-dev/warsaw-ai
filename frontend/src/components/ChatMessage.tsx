@@ -30,7 +30,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
     >
       {/* Avatar for assistant */}
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center text-neutral-400 font-semibold text-sm">
           AI
         </div>
       )}
@@ -38,15 +38,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
       {/* Message content */}
       <div
         className={cn(
-          "max-w-[75%] rounded-2xl px-4 py-3 shadow-lg transition-all hover:shadow-xl",
+          "max-w-[75%] rounded-2xl px-4 py-3 transition-all",
           isUser
-            ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-sm"
-            : "bg-slate-800/80 text-slate-100 rounded-bl-sm border border-slate-700/50 backdrop-blur-sm"
+            ? "bg-[#2a2a2a] text-neutral-100 rounded-br-sm border border-white/[0.08]"
+            : "bg-[#1a1a1a] text-neutral-100 rounded-bl-sm border border-white/[0.06]"
         )}
       >
         {/* Label */}
         {!isUser && (
-          <div className="text-xs font-semibold text-blue-400 mb-2">
+          <div className="text-xs font-semibold text-neutral-500 mb-2">
             Michał
           </div>
         )}
@@ -64,7 +64,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               
               // Strong/bold text
               strong: ({ children }) => (
-                <strong className={isUser ? "font-bold" : "font-bold text-blue-300"}>
+                <strong className={isUser ? "font-bold" : "font-bold text-neutral-200"}>
                   {children}
                 </strong>
               ),
@@ -89,8 +89,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
                   className={cn(
                     "underline underline-offset-2 transition-colors",
                     isUser 
-                      ? "hover:text-blue-200" 
-                      : "text-blue-400 hover:text-blue-300"
+                      ? "hover:text-neutral-200" 
+                      : "text-neutral-400 hover:text-neutral-300"
                   )}
                 >
                   {children}
@@ -112,11 +112,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
               code: ({ className, children }) => {
                 const isInline = !className;
                 return isInline ? (
-                  <code className="px-1.5 py-0.5 rounded bg-slate-900/50 text-blue-300 text-sm font-mono">
+                  <code className="px-1.5 py-0.5 rounded bg-[#0a0a0a] text-neutral-300 text-sm font-mono border border-white/[0.06]">
                     {children}
                   </code>
                 ) : (
-                  <code className="block px-3 py-2 rounded-lg bg-slate-900/50 text-blue-300 text-sm font-mono overflow-x-auto my-2">
+                  <code className="block px-3 py-2 rounded-lg bg-[#0a0a0a] text-neutral-300 text-sm font-mono overflow-x-auto my-2 border border-white/[0.06]">
                     {children}
                   </code>
                 );
@@ -124,7 +124,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               
               // Blockquotes
               blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-blue-500 pl-4 py-1 my-2 italic">
+                <blockquote className="border-l-4 border-neutral-700 pl-4 py-1 my-2 italic text-neutral-400">
                   {children}
                 </blockquote>
               ),
@@ -137,8 +137,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {/* Timestamp */}
         <div
           className={cn(
-            "text-xs mt-2 opacity-60",
-            isUser ? "text-right text-blue-100" : "text-left text-slate-400"
+            "text-xs mt-2 opacity-50",
+            isUser ? "text-right text-neutral-500" : "text-left text-neutral-600"
           )}
         >
           {formatTimestamp(message.timestamp)}
@@ -147,7 +147,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
       {/* Avatar for user */}
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center text-neutral-400 font-semibold text-sm">
           You
         </div>
       )}

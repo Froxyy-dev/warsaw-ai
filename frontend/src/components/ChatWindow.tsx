@@ -293,10 +293,10 @@ export function ChatWindow() {
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-            <div className="text-6xl opacity-50">👋</div>
+            <div className="text-6xl opacity-30">👋</div>
             <div>
-              <h2 className="text-2xl font-semibold text-white mb-2">Welcome!</h2>
-              <p className="text-slate-400">
+              <h2 className="text-2xl font-semibold text-neutral-200 mb-2">Welcome!</h2>
+              <p className="text-neutral-500">
                 Start a conversation to plan events, search venues, or get assistance
               </p>
             </div>
@@ -309,19 +309,19 @@ export function ChatWindow() {
 
             {isLoading && (
               <div className="flex justify-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2a2a2a] border border-white/[0.08] flex items-center justify-center text-neutral-400 font-semibold text-sm">
                   AI
                 </div>
-                <div className="max-w-[75%] rounded-2xl rounded-bl-sm px-4 py-3 bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm">
+                <div className="max-w-[75%] rounded-2xl rounded-bl-sm px-4 py-3 bg-[#1a1a1a] border border-white/[0.06]">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-                      <span className="text-sm text-slate-300">
+                      <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+                      <span className="text-sm text-neutral-300">
                         {isSearching ? 'Processing your request...' : 'Thinking...'}
                       </span>
                     </div>
                     {isSearching && (
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-neutral-500">
                         This may take a few moments. The assistant is working on your request.
                       </div>
                     )}
@@ -336,13 +336,13 @@ export function ChatWindow() {
 
       {/* Error Banner */}
       {error && (
-        <div className="mx-6 mb-4 px-4 py-3 bg-red-900/50 border border-red-800 rounded-lg">
-          <p className="text-sm text-red-200">{error}</p>
+        <div className="mx-6 mb-4 px-4 py-3 bg-red-950/50 border border-red-900/50 rounded-lg">
+          <p className="text-sm text-red-300">{error}</p>
         </div>
       )}
 
       {/* Input Form */}
-      <div className="border-t border-slate-800 p-6">
+      <div className="border-t border-white/[0.06] p-6">
         <form onSubmit={handleSendMessage} className="flex gap-3">
           <Textarea
             ref={inputRef}
@@ -351,14 +351,14 @@ export function ChatWindow() {
             onKeyDown={handleKeyPress}
             placeholder="Type your message..."
             disabled={isLoading}
-            className="resize-none bg-slate-800 border-slate-700 focus-visible:ring-blue-500 text-white placeholder:text-slate-500 min-h-[60px] max-h-[200px]"
+            className="resize-none bg-[#0a0a0a] border-white/[0.06] focus-visible:ring-1 focus-visible:ring-neutral-700 text-neutral-100 placeholder:text-neutral-600 min-h-[60px] max-h-[200px]"
             rows={1}
           />
           <Button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
             size="icon"
-            className="h-[60px] w-[60px] rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className="h-[60px] w-[60px] rounded-xl bg-[#2a2a2a] hover:bg-[#333333] disabled:opacity-50 border border-white/[0.08] text-neutral-300"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

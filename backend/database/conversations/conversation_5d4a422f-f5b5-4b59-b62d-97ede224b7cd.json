@@ -1,0 +1,47 @@
+{
+  "id": "5d4a422f-f5b5-4b59-b62d-97ede224b7cd",
+  "title": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj i...",
+  "messages": [
+    {
+      "id": "36c01a15-8be6-49ee-9e4e-8a133025d6ee",
+      "conversation_id": "5d4a422f-f5b5-4b59-b62d-97ede224b7cd",
+      "role": "user",
+      "content": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
+      "timestamp": "2025-11-30T00:08:12.772899",
+      "metadata": null
+    },
+    {
+      "id": "45fac188-4b48-499a-a9ad-75116d0e247d",
+      "conversation_id": "5d4a422f-f5b5-4b59-b62d-97ede224b7cd",
+      "role": "assistant",
+      "content": "Oto plan dla Twojej imprezy:\n\nZadzwonić do lokalu w Warszawie z następującymi instrukcjami:\n- Rezerwacja: 30 listopada, 16:00, 5 godzin.\n- Liczba osób: 10.\n- Proszę o dekoracje urodzinowe.\n- Proszę o propozycję menu.\n- Proszę o tort urodzinowy.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-30T01:08:18.597888",
+      "metadata": {
+        "model": "gemini-2.5-flash",
+        "should_continue_refresh": false
+      }
+    },
+    {
+      "id": "e99c8ad2-9819-457e-b996-0093d3284fc8",
+      "conversation_id": "5d4a422f-f5b5-4b59-b62d-97ede224b7cd",
+      "role": "user",
+      "content": "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska.",
+      "timestamp": "2025-11-30T00:08:35.353568",
+      "metadata": null
+    },
+    {
+      "id": "23944da6-0fe3-4608-a8be-e8fddc716a5a",
+      "conversation_id": "5d4a422f-f5b5-4b59-b62d-97ede224b7cd",
+      "role": "assistant",
+      "content": "Oto zaktualizowany plan:\n\nZadzwonić do lokalu w Warszawie z następującymi instrukcjami:\n- Rezerwacja: 30 listopada, 16:00, 5 godzin.\n- Liczba osób: 10.\n- Proszę o dekoracje urodzinowe.\n- Proszę menu: tradycyjna kuchnia polska.\n\nZadzwonić do cukierni z następującymi instrukcjami:\n- Zamów tort: \"Wszystkiego najlepszego Ada\".\n- Tort urodzinowy, profesjonalna cukiernia.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-30T01:08:41.835703",
+      "metadata": {
+        "model": "gemini-2.5-flash",
+        "should_continue_refresh": false
+      }
+    }
+  ],
+  "created_at": "2025-11-30T01:08:12.745280",
+  "updated_at": "2025-11-30T01:08:41.835881",
+  "status": "active"
+}
