@@ -1,202 +1,291 @@
-# 🤖 AI Call Agent
+# AI Chat Assistant - Frontend
 
-Agent AI do automatycznych rozmów telefonicznych i umawiania wizyt.
+A modern, beautiful frontend for the AI Chat Assistant built with Next.js 14, TypeScript, Tailwind CSS, and shadcn/ui.
 
-## 🚀 Szybki Start
+![Tech Stack](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)
+![React](https://img.shields.io/badge/React-18-61dafb)
 
-### Wymagania
-- Python 3.8+
-- Node.js 16+
-- npm lub yarn
+## 🚀 Features
 
-### Instalacja
+- **Modern SaaS Design**: Clean, minimal interface inspired by 2025 design trends
+- **Real-time Chat**: Interactive chat interface with auto-refresh
+- **TypeScript**: Full type safety throughout the application
+- **Responsive**: Works perfectly on desktop, tablet, and mobile
+- **Dark Theme**: Beautiful dark mode with blue accents
+- **Component Library**: Built with shadcn/ui components
+- **Optimistic Updates**: Instant UI feedback for better UX
+- **Loading States**: Smooth loading animations and skeletons
+- **Error Handling**: Clear error messages and recovery
 
-1. **Sklonuj repozytorium i zainstaluj zależności:**
+## 📦 Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3.4
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **Utilities**: clsx, tailwind-merge, class-variance-authority
+
+## 🎨 Design Philosophy
+
+This frontend follows modern 2025 SaaS design patterns:
+
+- **Whitespace**: Generous spacing for clarity
+- **Consistency**: Unified padding (p-4, p-6), rounded corners (rounded-xl)
+- **Hierarchy**: Clear visual hierarchy with typography scale
+- **Shadows**: Subtle shadows for depth without clutter
+- **Responsive**: Mobile-first approach with grid/flex layouts
+- **Accessibility**: Semantic HTML, proper labels, good contrast
+
+## 🛠️ Installation
+
 ```bash
-make setup
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-2. **Uruchom aplikację:**
-
-W dwóch osobnych terminalach:
-```bash
-# Terminal 1 - Backend
-make run-backend
-
-# Terminal 2 - Frontend
-make run-frontend
-```
-
-Lub w jednym terminalu:
-```bash
-make run-all
-```
-
-3. **Otwórz aplikację w przeglądarce:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-## 📁 Struktura Projektu
+## 📁 Project Structure
 
 ```
-warsaw-ai/
-├── backend/                # FastAPI Backend
-│   ├── main.py            # Główna aplikacja FastAPI
-│   ├── models.py          # Modele danych (Pydantic)
-│   ├── routers/           # Endpointy API
-│   │   ├── calls.py       # Zarządzanie połączeniami
-│   │   └── appointments.py # Zarządzanie wizytami
-│   └── requirements.txt   # Zależności Python
+frontend/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── layout.tsx         # Root layout with fonts & metadata
+│   │   ├── page.tsx           # Home page (main dashboard)
+│   │   └── globals.css        # Global styles + Tailwind directives
+│   │
+│   ├── components/
+│   │   ├── ChatWindow.tsx     # Main chat interface component
+│   │   └── ui/                # shadcn/ui components
+│   │       ├── button.tsx     # Button variants
+│   │       ├── card.tsx       # Card components
+│   │       ├── input.tsx      # Input field
+│   │       ├── textarea.tsx   # Textarea field
+│   │       ├── badge.tsx      # Badge component
+│   │       └── skeleton.tsx   # Loading skeleton
+│   │
+│   ├── api/                   # API layer
+│   │   ├── axios.ts          # Axios instance with config
+│   │   ├── chatApi.ts        # Chat API functions
+│   │   └── types.ts          # TypeScript interfaces
+│   │
+│   └── lib/
+│       └── utils.ts          # Utility functions (cn, etc.)
 │
-├── frontend/              # React Frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/    # Komponenty React
-│   │   │   ├── CallForm.js        # Formularz nowego połączenia
-│   │   │   ├── CallsList.js       # Lista połączeń
-│   │   │   └── AppointmentsList.js # Lista wizyt
-│   │   ├── api/
-│   │   │   └── axios.js   # Konfiguracja API
-│   │   ├── App.js         # Główny komponent
-│   │   └── index.js       # Entry point
-│   └── package.json
-│
-├── Makefile              # Komendy do zarządzania projektem
-└── README.md            # Ten plik
+├── next.config.js            # Next.js configuration
+├── tailwind.config.ts        # Tailwind configuration
+├── tsconfig.json             # TypeScript configuration
+├── components.json           # shadcn/ui configuration
+└── package.json              # Dependencies
 ```
 
-## 🎯 Funkcjonalności
+## 🎯 Key Components
 
-### Aktualnie dostępne:
-- ✅ Tworzenie nowych połączeń AI
-- ✅ Przegląd historii połączeń
-- ✅ Zarządzanie wizytami
-- ✅ REST API z dokumentacją (FastAPI)
-- ✅ Nowoczesny interfejs użytkownika (React)
-- ✅ **Chat AI z integracją Gemini** - Multiturn konwersacje z AI agentem
-- ✅ **Persystencja konwersacji** - Lokalne przechowywanie w JSON
-- ✅ **🎉 Party Planner** - Inteligentne planowanie imprez z iteracyjnym refinementem
-  - Automatyczne wykrywanie party requests
-  - **Action-oriented format** - plany gotowe do wykonania przez voice agent
-  - Grupowanie instrukcji po miejscach (lokal, cukiernia, etc)
-  - Modyfikacja planów na podstawie feedbacku
-  - Przenoszenie zadań między grupami (np. tort do cukierni)
-  - Zbieranie danych kontaktowych
-  - State persistence między sesjami
+### ChatWindow
+The main chat interface with:
+- Message history display
+- Real-time message sending
+- Auto-refresh during backend processing
+- Optimistic UI updates
+- Loading indicators
+- Error handling
 
-### Do implementacji:
-- 🔄 Integracja z Twilio (dla prawdziwych połączeń)
-- 🔄 Baza danych (PostgreSQL/MongoDB) - obecnie używamy JSON storage
-- 🔄 Automatyczne transkrypcje rozmów
-- 🔄 System powiadomień
-- 🔄 Kalendarz i synchronizacja wizyt
-- 🔄 WebSocket dla real-time chat updates
-- 🔄 Streaming AI responses
+### Page Layout
+Dashboard-style layout with:
+- Chat panel (2/3 width on desktop)
+- Sidebar with quick actions (1/3 width)
+- Status indicators
+- Responsive grid system
 
-## 🔧 API Endpointy
+### UI Components (shadcn/ui)
+- **Card**: Container with header, content, footer
+- **Button**: Multiple variants (default, outline, ghost, etc.)
+- **Input/Textarea**: Form controls with focus states
+- **Badge**: Status indicators
+- **Skeleton**: Loading placeholders
 
-### Calls (Połączenia)
-- `POST /api/calls/` - Utwórz nowe połączenie
-- `GET /api/calls/` - Pobierz wszystkie połączenia
-- `GET /api/calls/{call_id}` - Pobierz szczegóły połączenia
-- `PATCH /api/calls/{call_id}/status` - Zaktualizuj status połączenia
-- `DELETE /api/calls/{call_id}` - Usuń połączenie
+## 🔧 Configuration
 
-### Appointments (Wizyty)
-- `POST /api/appointments/` - Utwórz nową wizytę
-- `GET /api/appointments/` - Pobierz wszystkie wizyty
-- `GET /api/appointments/{appointment_id}` - Pobierz szczegóły wizyty
-- `PATCH /api/appointments/{appointment_id}/status` - Zaktualizuj status wizyty
-- `DELETE /api/appointments/{appointment_id}` - Usuń wizytę
+### Backend API Proxy
+API calls are proxied through Next.js to avoid CORS issues:
 
-### Chat (Konwersacje AI)
-- `POST /api/chat/conversations/` - Utwórz nową konwersację
-- `GET /api/chat/conversations/` - Pobierz listę konwersacji
-- `GET /api/chat/conversations/{conversation_id}` - Pobierz konwersację z historią
-- `POST /api/chat/conversations/{conversation_id}/messages` - Wyślij wiadomość
-- `DELETE /api/chat/conversations/{conversation_id}` - Usuń konwersację
-- `GET /api/chat/conversations/{conversation_id}/messages` - Pobierz wiadomości (z paginacją)
-
-## 🔑 Konfiguracja (TODO)
-
-Stwórz plik `.env` w katalogu `backend/`:
-
-```env
-# OpenAI API Key (dla AI konwersacji)
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Twilio credentials (dla prawdziwych połączeń)
-TWILIO_ACCOUNT_SID=your_twilio_account_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_PHONE_NUMBER=your_twilio_phone_number
+```javascript
+// next.config.js
+async rewrites() {
+  return [
+    {
+      source: '/api/:path*',
+      destination: 'http://localhost:8000/api/:path*',
+    },
+  ];
+}
 ```
 
-## 🛠️ Komendy Makefile
+### Tailwind Theme
+Custom color scheme defined in `tailwind.config.ts` and `globals.css`:
+- Primary: Blue (#2563eb)
+- Background: Slate/Gray dark tones
+- Borders: Slate-800
+- Text: Slate-100/400
+
+## 📱 Responsive Design
+
+Breakpoints:
+- **Mobile**: < 768px (1 column)
+- **Tablet**: 768px - 1024px (2 columns)
+- **Desktop**: > 1024px (3 columns)
+
+The layout automatically adjusts:
+- Chat takes full width on mobile
+- Sidebar moves below chat on tablet
+- Side-by-side layout on desktop
+
+## 🔄 State Management
+
+Using React hooks for local state:
+- `useState` for messages, input, loading states
+- `useEffect` for initialization and auto-refresh
+- `useRef` for DOM references and intervals
+
+No global state management (Redux, Zustand) needed for this simple app.
+
+## 🧪 Development
+
+### Adding New Pages
+Create a new folder in `src/app/`:
+```bash
+src/app/tasks/page.tsx      # /tasks route
+src/app/venues/page.tsx     # /venues route
+```
+
+### Adding New Components
+```bash
+# Add shadcn/ui component
+npx shadcn-ui@latest add dialog
+
+# Create custom component
+src/components/MyComponent.tsx
+```
+
+### Styling Guidelines
+```tsx
+// Use Tailwind utility classes
+<div className="flex items-center gap-4 p-6 rounded-xl bg-slate-800">
+  {/* content */}
+</div>
+
+// Use cn() for conditional classes
+import { cn } from "@/lib/utils";
+
+<div className={cn(
+  "base-classes",
+  condition && "conditional-classes"
+)}>
+```
+
+## 🚦 API Integration
+
+All API calls go through `/api/*` which proxies to the backend:
+
+```typescript
+// Example: Send a message
+import { sendMessage } from '@/api/chatApi';
+
+const response = await sendMessage(conversationId, content);
+```
+
+Available API functions:
+- `createConversation()`: Create new conversation
+- `getConversations()`: List all conversations
+- `getConversation(id)`: Get conversation details
+- `sendMessage(id, content)`: Send message
+- `deleteConversation(id)`: Delete conversation
+
+## 🎨 Customization
+
+### Change Colors
+Edit `tailwind.config.ts` and `src/app/globals.css`:
+```css
+:root {
+  --primary: 221.2 83.2% 53.3%;  /* Modify hue/saturation/lightness */
+  --background: 222.2 84% 4.9%;
+  /* ... more variables */
+}
+```
+
+### Change Fonts
+Edit `src/app/layout.tsx`:
+```typescript
+import { Inter, Roboto } from "next/font/google";
+
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "700"] });
+```
+
+### Change Layout
+Edit `src/app/page.tsx` to modify the dashboard structure.
+
+## 📄 Scripts
 
 ```bash
-make help          # Pokaż wszystkie dostępne komendy
-make setup         # Zainstaluj wszystkie zależności
-make run-backend   # Uruchom backend
-make run-frontend  # Uruchom frontend
-make run-all       # Uruchom obie aplikacje
-make clean         # Wyczyść instalacje
+# Development (with hot reload)
+npm run dev
+
+# Production build
+npm run build
+
+# Run production build
+npm start
+
+# Lint code
+npm run lint
 ```
 
-## 🧪 Testowanie API
+## 🐛 Troubleshooting
 
-Możesz przetestować API używając:
-1. **Swagger UI**: http://localhost:8000/docs
-2. **ReDoc**: http://localhost:8000/redoc
-3. **curl** lub **Postman**
-
-Przykład curl:
+**Port already in use?**
 ```bash
-curl -X POST "http://localhost:8000/api/calls/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone_number": "+48123456789",
-    "customer_name": "Jan Kowalski",
-    "purpose": "schedule_appointment",
-    "preferred_date": "2025-12-01"
-  }'
+PORT=3001 npm run dev
 ```
 
-## 🚧 Następne Kroki
+**Backend not connecting?**
+- Ensure backend is running on `http://localhost:8000`
+- Check `next.config.js` proxy configuration
 
-1. **Integracja z AI:**
-   - Dodaj OpenAI GPT dla naturalnych konwersacji
-   - Implementuj rozpoznawanie intencji użytkownika
+**TypeScript errors?**
+```bash
+rm -rf node_modules .next
+npm install
+```
 
-2. **Integracja z Twilio:**
-   - Połączenia głosowe
-   - SMS powiadomienia
-   - Transkrypcje rozmów
+**Styles not updating?**
+- Clear Next.js cache: `rm -rf .next`
+- Restart dev server
 
-3. **Baza danych:**
-   - Przejście z in-memory do PostgreSQL/MongoDB
-   - Migracje bazy danych
+## 📚 Resources
 
-4. **Autoryzacja:**
-   - System logowania
-   - JWT tokens
-   - Role użytkowników
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Radix UI](https://www.radix-ui.com/)
 
-5. **UI/UX:**
-   - Panel administracyjny
-   - Kalendarz wizyt
-   - Statystyki i raporty
+## 📝 License
 
-## 📝 Licencja
+Part of the warsaw-ai project.
 
-MIT
+---
 
-## 👨‍💻 Rozwój
-
-To jest szkielet projektu gotowy do dalszego rozwoju. Możesz:
-- Dodawać nowe endpointy w `backend/routers/`
-- Tworzyć nowe komponenty w `frontend/src/components/`
-- Rozszerzać modele danych w `backend/models.py`
-
-Happy coding! 🚀
+**Built with ❤️ using modern web technologies**
 
