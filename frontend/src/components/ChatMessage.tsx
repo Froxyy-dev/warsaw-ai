@@ -21,6 +21,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
     });
   };
 
+  // Preprocessing: Clean up [ACTION GROUP X] markers
+  const processContent = (content: string): string => {
+    // Remove [ACTION GROUP X] completely and just keep the content
+    // This removes the technical marker but keeps the structure
+    return content.replace(/\[ACTION GROUP \d+\]\s*/g, '');
+  };
+
   return (
     <div
       className={cn(
@@ -60,7 +67,9 @@ export function ChatMessage({ message }: ChatMessageProps) {
             remarkPlugins={[remarkGfm]}
             components={{
               // Paragraphs
-              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+              p: ({ children }) => (
+                <p className="mb-2.5 last:mb-0 leading-relaxed">{children}</p>
+              ),
               
               // Strong/bold text
               strong: ({ children }) => (
@@ -69,15 +78,25 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 </strong>
               ),
               
-              // Lists
+              // Lists - styled as cards/tiles
               ul: ({ children }) => (
-                <ul className="my-2 space-y-1 list-disc list-inside">{children}</ul>
+                <ul className="my-3 space-y-2">{children}</ul>
               ),
               ol: ({ children }) => (
-                <ol className="my-2 space-y-1 list-decimal list-inside">{children}</ol>
+                <ol className="my-3 space-y-2">{children}</ol>
               ),
               li: ({ children }) => (
-                <li className="leading-relaxed">{children}</li>
+                <li className={cn(
+                  "leading-relaxed px-3 py-2.5 rounded-lg transition-colors",
+                  isUser 
+                    ? "bg-[#1a1a1a]/50 border border-white/[0.08]" 
+                    : "bg-[#0a0a0a] border border-white/[0.06] hover:border-white/[0.12]"
+                )}>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-0.5 flex-shrink-0">•</span>
+                    <span className="flex-1">{children}</span>
+                  </div>
+                </li>
               ),
               
               // Links
@@ -97,15 +116,21 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 </a>
               ),
               
-              // Headings
+              // Headings - styled as section separators
               h1: ({ children }) => (
-                <h1 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h1>
+                <h1 className="text-lg font-bold mb-3 mt-4 first:mt-0 pb-2 border-b border-white/[0.08]">
+                  {children}
+                </h1>
               ),
               h2: ({ children }) => (
-                <h2 className="text-base font-bold mb-2 mt-3 first:mt-0">{children}</h2>
+                <h2 className="text-base font-bold mb-3 mt-4 first:mt-0 pb-2 border-b border-white/[0.06] text-neutral-200">
+                  {children}
+                </h2>
               ),
               h3: ({ children }) => (
-                <h3 className="text-sm font-bold mb-1 mt-2 first:mt-0">{children}</h3>
+                <h3 className="text-sm font-semibold mb-2 mt-3 first:mt-0 text-neutral-300">
+                  {children}
+                </h3>
               ),
               
               // Code blocks
@@ -122,15 +147,17 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 );
               },
               
-              // Blockquotes
+              // Blockquotes - styled as info panels
               blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-neutral-700 pl-4 py-1 my-2 italic text-neutral-400">
-                  {children}
+                <blockquote className="border-l-4 border-emerald-500/30 bg-emerald-500/5 px-4 py-3 my-3 rounded-r-lg">
+                  <div className="text-neutral-300 italic">
+                    {children}
+                  </div>
                 </blockquote>
               ),
             }}
           >
-            {message.content}
+            {processContent(message.content)}
           </ReactMarkdown>
         </div>
 

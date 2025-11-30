@@ -67,10 +67,12 @@ Zadzwonić do lokalu z salami z następującymi instrukcjami:
 ZŁY przykład (za długi):
 - "Zarezerwuj salę lub odpowiednią przestrzeń na imprezę urodzinową dla Twojej dziewczyny..." ❌
 
-Odpowiedź:
+Odpowiedź (pisz bez nawiasów kwadratowych):
 Oto plan dla Twojej imprezy:
 
-[ACTION GROUP - max 5 instrukcji!]
+Zadzwonić do [miejsce] z następującymi instrukcjami:
+- [instrukcja 1]
+- [instrukcja 2]
 
 Czy chcesz coś zmienić czy zatwierdzasz?"""
 
@@ -89,11 +91,14 @@ ZASADY:
 4. Jeśli dodaje szczegół: dodaj KRÓTKO
 5. BEZ gadania, TYLKO fakty
 
-Odpowiedź:
+Odpowiedź (pisz bez nawiasów kwadratowych, oddzielaj grupy pustą linią):
 Oto zaktualizowany plan:
 
-[ACTION GROUP 1]
-[ACTION GROUP 2 - jeśli potrzebny]
+Zadzwonić do [miejsce 1] z następującymi instrukcjami:
+- [instrukcja]
+
+Zadzwonić do [miejsce 2] z następującymi instrukcjami (jeśli potrzebne):
+- [instrukcja]
 
 Czy chcesz coś zmienić czy zatwierdzasz?"""
 
