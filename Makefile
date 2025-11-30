@@ -23,7 +23,7 @@ run-backend:
 
 run-frontend:
 	@echo "🚀 Starting React frontend..."
-	cd frontend && npm start
+	cd frontend && npm run dev
 
 run-all:
 	@echo "🚀 Starting both backend and frontend..."

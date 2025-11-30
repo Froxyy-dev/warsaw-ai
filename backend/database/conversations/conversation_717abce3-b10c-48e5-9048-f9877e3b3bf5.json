@@ -1,0 +1,47 @@
+{
+  "id": "717abce3-b10c-48e5-9048-f9877e3b3bf5",
+  "title": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj i...",
+  "messages": [
+    {
+      "id": "c7203e4d-e73c-4792-80c1-fe0a1e4e53fc",
+      "conversation_id": "717abce3-b10c-48e5-9048-f9877e3b3bf5",
+      "role": "user",
+      "content": "Moja dziewczyna ma pojutrze urodziny. Zorganizuj imprezę urodzinową na 10 osób w Warszawie, która zacznie się około godziny 16:00 i potrwa około 5 godzin.",
+      "timestamp": "2025-11-30T07:58:54.014588",
+      "metadata": null
+    },
+    {
+      "id": "a756cbb6-77ac-45f6-bdd3-994eab25f501",
+      "conversation_id": "717abce3-b10c-48e5-9048-f9877e3b3bf5",
+      "role": "assistant",
+      "content": "Oto plan dla Twojej imprezy:\n\nZadzwonić do lokalu w Warszawie z następującymi instrukcjami:\n- Rezerwacja: 2 grudnia, 16:00-21:00.\n- Liczba osób: 10.\n- Dekoracje urodzinowe.\n- Menu na imprezę, tort.\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-30T08:58:58.652644",
+      "metadata": {
+        "model": "gemini-2.5-flash",
+        "should_continue_refresh": false
+      }
+    },
+    {
+      "id": "6360e6db-6c55-4072-9ea6-0adbac96525e",
+      "conversation_id": "717abce3-b10c-48e5-9048-f9877e3b3bf5",
+      "role": "user",
+      "content": "Chciałbym żeby tort urodzinowy zamówić z cukierni zajmującej się profesjonalnie tortami, a na torcie będzie napis, wszystkiego najlepszego Ada. Chciałbym  żeby była tradycyjna kuchnia polska.",
+      "timestamp": "2025-11-30T07:59:00.252572",
+      "metadata": null
+    },
+    {
+      "id": "809d4659-a575-4044-97cb-c14a6e8674d1",
+      "conversation_id": "717abce3-b10c-48e5-9048-f9877e3b3bf5",
+      "role": "assistant",
+      "content": "Oto zaktualizowany plan:\n\n[ACTION GROUP 1]\nZadzwonić do lokalu w Warszawie:\n- Rezerwacja: 2 grudnia, 16:00-21:00.\n- Liczba osób: 10.\n- Dekoracje urodzinowe.\n- Menu: tradycyjna kuchnia polska.\n\n[ACTION GROUP 2]\nZamówić tort:\n- Z profesjonalnej cukierni.\n- Napis: \"Wszystkiego najlepszego Ada\".\n\nCzy chcesz coś zmienić czy zatwierdzasz?",
+      "timestamp": "2025-11-30T08:59:04.277285",
+      "metadata": {
+        "model": "gemini-2.5-flash",
+        "should_continue_refresh": false
+      }
+    }
+  ],
+  "created_at": "2025-11-30T08:58:53.980371",
+  "updated_at": "2025-11-30T08:59:04.277948",
+  "status": "active"
+}
