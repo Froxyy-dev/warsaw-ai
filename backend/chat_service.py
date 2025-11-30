@@ -386,18 +386,19 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             if self.party_planner.state == PlanState.EXECUTING:
                 plan_id = self.party_planner.gathered_info.get("plan_id")
                 if plan_id:
-                    voice_starting_msg = Message(
-                        id=str(uuid.uuid4()),
-                        conversation_id=conversation_id,
-                        role=MessageRole.ASSISTANT,
-                        content="🎙️ **Zaczynam wykonywać połączenia głosowe...**\n\nAgent głosowy dzwoni do wybranych miejsc. Sprawdzaj aktualizacje poniżej!",
-                        timestamp=datetime.now(),
-                        metadata={
-                            "step": "voice_agent_starting",
-                            "should_continue_refresh": True
-                        }
-                    )
-                    storage_manager.add_message_to_conversation(conversation_id, voice_starting_msg)
+                    # ❌ COMMENTED OUT - user doesn't want this verbose message
+                    # voice_starting_msg = Message(
+                    #     id=str(uuid.uuid4()),
+                    #     conversation_id=conversation_id,
+                    #     role=MessageRole.ASSISTANT,
+                    #     content="🎙️ **Zaczynam wykonywać połączenia głosowe...**\n\nAgent głosowy dzwoni do wybranych miejsc. Sprawdzaj aktualizacje poniżej!",
+                    #     timestamp=datetime.now(),
+                    #     metadata={
+                    #         "step": "voice_agent_starting",
+                    #         "should_continue_refresh": True
+                    #     }
+                    # )
+                    # storage_manager.add_message_to_conversation(conversation_id, voice_starting_msg)
                     
                     # Execute voice agent
                     await self._execute_voice_agent_in_background(conversation_id, plan_id)
@@ -503,25 +504,26 @@ Odpowiadaj w sposób profesjonalny, przyjazny i konkretny."""
             logger.info(f"   Task ID: {task.task_id}")
             logger.info(f"   Places to call: {len(task.places)}")
             
+            # ❌ COMMENTED OUT - user doesn't want this verbose message
             # Send initial message about this task
-            task_type = "lokal/restaurację" if "restaurant" in task.task_id else "cukiernię"
-            
-            logger.info(f"💬 Creating intro message for {task_type}...")
-            intro_msg = Message(
-                id=str(uuid.uuid4()),
-                conversation_id=conversation_id,
-                role=MessageRole.ASSISTANT,
-                content=f"📞 Zaczynam dzwonić do {task_type}...\n\nMam {len(task.places)} opcji do wypróbowania.",
-                timestamp=datetime.now(),
-                metadata={
-                    "task_id": task.task_id,
-                    "step": "task_start",
-                    "should_continue_refresh": True  # ✅ Keep refreshing - calls coming!
-                }
-            )
-            logger.info(f"💾 Saving intro message to conversation...")
-            storage_manager.add_message_to_conversation(conversation_id, intro_msg)
-            logger.info(f"✅ Intro message saved")
+            # task_type = "lokal/restaurację" if "restaurant" in task.task_id else "cukiernię"
+            # 
+            # logger.info(f"💬 Creating intro message for {task_type}...")
+            # intro_msg = Message(
+            #     id=str(uuid.uuid4()),
+            #     conversation_id=conversation_id,
+            #     role=MessageRole.ASSISTANT,
+            #     content=f"📞 Zaczynam dzwonić do {task_type}...\n\nMam {len(task.places)} opcji do wypróbowania.",
+            #     timestamp=datetime.now(),
+            #     metadata={
+            #         "task_id": task.task_id,
+            #         "step": "task_start",
+            #         "should_continue_refresh": True  # ✅ Keep refreshing - calls coming!
+            #     }
+            # )
+            # logger.info(f"💾 Saving intro message to conversation...")
+            # storage_manager.add_message_to_conversation(conversation_id, intro_msg)
+            # logger.info(f"✅ Intro message saved")
             
             # Try each place until success
             logger.info(f"🔄 Starting to call {len(task.places)} places...")

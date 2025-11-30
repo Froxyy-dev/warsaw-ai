@@ -440,13 +440,14 @@ Gdy masz WSZYSTKO, zwróć JSON (włącz dane z original):
                 # ⭐ Save plan_id for later retrieval
                 self.gathered_info["plan_id"] = plan_id
                 
-                response = f"✅ Lista zadań gotowa! Przygotowano {len(tasks)} zadań.\n"
-                response += "📋 Szczegóły wyświetlone w konsoli backendu.\n\n"
-                response += "📞 Rozpoczynam wykonywanie zadań..."
+                # ❌ COMMENTED OUT - user doesn't want these verbose messages
+                # response = f"✅ Lista zadań gotowa! Przygotowano {len(tasks)} zadań.\n"
+                # response += "📋 Szczegóły wyświetlone w konsoli backendu.\n\n"
+                # response += "📞 Rozpoczynam wykonywanie zadań..."
                 
                 # ⭐ Transition to EXECUTING (not COMPLETE - we'll execute now!)
                 self.state = PlanState.EXECUTING
-                return response
+                return ""  # Return empty string - chat_service will handle voice agent messages
             else:
                 return "❌ Nie udało się wygenerować zadań."
             
